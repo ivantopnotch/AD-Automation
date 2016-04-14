@@ -1,0 +1,85 @@
+#Rakefile
+require 'rspec/core/rake_task'
+require 'ci/reporter/rake/rspec'
+require 'dotenv'
+
+desc "Test With Firefox Desktop Browser"
+RSpec::Core::RakeTask.new('firefox') do |t|
+  t.rspec_opts = ["--format documentation","--color"]
+  #t.pattern = 'spec/*_spec.rb'
+  t.pattern = 'spec/my_account_spec.rb'
+  Dotenv.load('dotenv/FirefoxDesktop.env')
+end
+
+desc "Test With Chrome Desktop Browser"
+RSpec::Core::RakeTask.new('chrome') do |t|
+  t.rspec_opts = ["--format documentation","--color"]
+  #t.pattern = 'spec/*_spec.rb'
+  t.pattern = 'spec/my_account_spec.rb'
+  Dotenv.load('dotenv/ChromeDesktop.env')
+end
+
+desc "Test With Safari Desktop Browser"
+RSpec::Core::RakeTask.new('safari') do |t|
+  t.rspec_opts = ["--format documentation","--color"]
+  t.pattern = 'spec/*_spec.rb'
+  Dotenv.load('dotenv/FirefoxDesktop.env')
+end
+
+# desc "Test With Chrome iPhone 5 portrait - 320 x 586"
+# RSpec::Core::RakeTask.new('iPhone5Port') do |t|
+#   t.rspec_opts = ["--format documentation","--color"]
+#   t.pattern = 'spec/*_spec.rb'
+#   Dotenv.load('dotenv/ChromeIPhone5Port.env')
+# end
+
+# desc "Test With Chrome iPhone 6 portrait - 375 x 667"
+# RSpec::Core::RakeTask.new('iPhone6Port') do |t|
+#   t.rspec_opts = ["--format documentation","--color"]
+#   t.pattern = 'spec/*_spec.rb'
+#   Dotenv.load('dotenv/ChromeIPhone6Port.env')
+# end
+
+# desc "Test With Chrome iPhone 5 landscape - 586 x 320"
+# RSpec::Core::RakeTask.new('iPhone5Land') do |t|
+#   t.rspec_opts = ["--format documentation","--color"]
+#   t.pattern = 'spec/*_spec.rb'
+#   Dotenv.load('dotenv/ChromeIPhone5Land.env')
+# end
+
+# desc "Test With Chrome iPhone 6 landscape - 667 x 375"
+# RSpec::Core::RakeTask.new('iPhone6Land') do |t|
+#   t.rspec_opts = ["--format documentation","--color"]
+#   t.pattern = 'spec/*_spec.rb'
+#   Dotenv.load('dotenv/ChromeIPhone6Land.env')
+# end
+
+# desc "Test With Chrome iPad Portrait - 768 x 1024"
+# RSpec::Core::RakeTask.new('iPadPort') do |t|
+#   t.rspec_opts = ["--format documentation","--color"]
+#   t.pattern = 'spec/*_spec.rb'
+#   Dotenv.load('dotenv/ChromeIPadPort.env')
+# end
+
+# desc "Test With Chrome iPad Landscape - 1024 x 768"
+# RSpec::Core::RakeTask.new('iPadLand') do |t|
+#   t.rspec_opts = ["--format documentation","--color"]
+#   t.pattern = 'spec/*_spec.rb'
+#   Dotenv.load('dotenv/ChromeIPadLand.env')
+# end
+
+desc "Test With IE Desktop Browser"
+RSpec::Core::RakeTask.new('ie') do |t|
+  t.rspec_opts = ["--format documentation","--color"]
+  #t.pattern = 'spec/*_spec.rb'
+  t.pattern = 'spec/my_account_spec.rb'
+  Dotenv.load('dotenv/IEDesktop.env')
+end
+
+desc "Test With Edge Desktop Browser"
+RSpec::Core::RakeTask.new('edge') do |t|
+  t.rspec_opts = ["--format documentation","--color"]
+  #t.pattern = 'spec/*_spec.rb'
+  t.pattern = 'spec/dental_services_spec.rb'
+  Dotenv.load('dotenv/EdgeDesktop.env')
+end

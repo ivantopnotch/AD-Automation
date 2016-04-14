@@ -1,0 +1,138 @@
+{
+	"top-pages":
+	{
+		"home":"Offices Across US",
+		"SAA":"Schedule",
+		"FAO":"Find a Dental Office",
+		"search":"Search",
+		"my-account":"My Account",
+		"dental-services":"Dental Health Services",
+		"dentures":"Dentures",
+		"pricing-offers":"Dental Pricing & Offers",
+		"reviews":"Patient Reviews",
+		"what-to-expect":"What to Expect",
+		"oral-health":"Oral Health Tips",
+		"about":"About",
+		"faqs":"Dental FAQs",
+		"site-map":"Site Map",
+		"office-listings":"Site Map"
+	},
+
+	"dental-services":
+	{
+		"emergency-care":"Emergency Dentist",
+		"check-up":"Dental Check-Up",
+		"peridontal-disease":"Periodontal Disease Treatment",
+		"tooth-extraction":"Tooth Extraction",
+		"fillings":"Tooth Fillings",
+		"root-canal":"What is a Root Canal",
+		"root-canal-cost":"Root Canal Cost",
+		"dental-crowns":"Dental Crowns",
+		"dental-bridges":"Dental Bridge",
+		"oral-surgery":"Oral Surgery",
+		"dental-implants":"Dental Implants",
+		"dental-implant-cost":"Dental Implant Cost",
+		"cosmetic-dentistry":"Cosmetic Dentistry",
+		"teeth-whitening":"Teeth Whitening",
+		"dental-veneers":"Dental Veneers"
+	},
+
+	"dentures":
+	{
+		"dentures-made-affordable":"Dentures Made Affordable",
+		"denture-cost":"Dentures Cost",
+		"denture-warranties":"Denture Warranties",
+		"types-of-dentures":"Types of Dentures",
+		"custom-dentures":"Custom Dentures",
+		"partial-dentures":"Partial Dentures",
+		"cast-partial":"Cast Partial Dentures",
+		"flexilytes":"FlexiLytes",
+		"flexilytes-combo":"FlexiLytes Combo",
+		"full-dentures":"Full Dentures",
+		"basic-full":"Basic Full Dentures",
+		"classic-full":"Classic Full",
+		"naturalytes":"NaturaLytes",
+		"comfilytes":"ComfiLytes",
+		"securedent":"SecureDent",
+		"denture-repair-reline":"Denture Repair & Reline",
+		"denture-advice":"Getting Dentures",
+		"when-to-get-dentures":"When to Get Dentures",
+		"denture-facts-mythos":"Denture Facts & Myths",
+		"how-to-clean-dentures":"How To Clean Dentures"
+	},
+
+	"reviews":
+	{
+		"write-a-review":"Share Your Story",
+		"read-reviews":"Latest Dentist Reviews"
+	},
+
+	"what-to-expect":
+	{
+		"peace-of-mind-promise":"Peace of Mind Promise",
+		"first-dental-visit":"First Dental Visit",
+		"overcoming-dental-anxiety":"Fear of the Dentist & Dental Anxiety",
+		"emergency-treatment":"Emergency Dental Services",
+		"on-going-care-appointment":"Dental Hygienist Appointment",
+		"understanding-dental-treatment":"Understanding Your Dental Treatment Plan",
+		"getting-dentures":"Getting Dentures: What to Expect"
+	},
+
+	"oral-health":
+	{
+		"oral-health-overall-health":"Oral Health and Overall Health",
+		"oral-hygiene":"Oral Hygiene",
+		"brushing":"How to Brush Your Teeth",
+		"flossing":"How to Floss",
+		"gum-disease":"Gum Disease",
+		"cavities":"Cavities",
+		"mouth-sores":"Mouth Sores",
+		"mouth-throat-cancer":"Mouth & Throat Cancer",
+		"TMJ":"Temporomandibular Joint Disorder",
+		"glossary":"Dental Terminology"
+	},
+
+	"about":
+	{
+		"contact":"Contact Us",
+		"partnerships":"Partnerships",
+		"join-our-team":"Careers",
+		"real-estate":"Real Estate",
+		"HMM":"Healthy Mouth Movement",
+		"our-mission":"Our Mission",
+		"newsroom":"Newsroom",
+		"blog":"Blog"
+	},
+
+	"faqs":
+	{
+		"my-first-visit":"First Dental Visit",
+		"appointments":"Dental Appointments",
+		"dental-services":"Dental Health Services",
+		"dentures":"Dentures",
+		"my-account":"My Account",
+		"oral-hygiene":"Oral Hygiene"
+	},
+
+	"my-account":
+	{
+		"sign-up":"My Account",
+		"sign-in":"My Account"
+	},
+
+	"office":
+	{
+		"about-office":"Dentist",
+		"pricing-offers":"Dental Pricing & Offers",
+		"dentures-partials":"Dentures & Partials",
+		"insurance-financing":"Dental Insurance & Financing"
+	},
+
+	"misc":
+	{
+		"patient-forms":"Patient Forms",
+		"sign-up":"Sign Up",
+		"terms-of-use":"Terms of Use",
+		"privacy-policy":"Privacy Policy"
+	}
+}
