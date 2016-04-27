@@ -6,25 +6,33 @@ require 'dotenv'
 desc "Test With Firefox Desktop Browser"
 RSpec::Core::RakeTask.new('firefox') do |t|
   t.rspec_opts = ["--format documentation","--color"]
-  #t.pattern = 'spec/*_spec.rb'
-  t.pattern = 'spec/my_account_spec.rb'
+  t.pattern = 'spec/*_spec.rb'
+  #t.pattern = 'spec/my_account_spec.rb'
   Dotenv.load('dotenv/FirefoxDesktop.env')
 end
 
 desc "Test With Chrome Desktop Browser"
 RSpec::Core::RakeTask.new('chrome') do |t|
   t.rspec_opts = ["--format documentation","--color"]
-  #t.pattern = 'spec/*_spec.rb'
-  t.pattern = 'spec/my_account_spec.rb'
+  t.pattern = 'spec/*_spec.rb'
+  #t.pattern = 'spec/my_account_spec.rb'
   Dotenv.load('dotenv/ChromeDesktop.env')
 end
 
-desc "Test With Safari Desktop Browser"
-RSpec::Core::RakeTask.new('safari') do |t|
+desc "Test With IE Desktop Browser"
+RSpec::Core::RakeTask.new('ie') do |t|
   t.rspec_opts = ["--format documentation","--color"]
   t.pattern = 'spec/*_spec.rb'
-  Dotenv.load('dotenv/FirefoxDesktop.env')
+  #t.pattern = 'spec/my_account_spec.rb'
+  Dotenv.load('dotenv/IEDesktop.env')
 end
+
+# desc "Test With Safari Desktop Browser"
+# RSpec::Core::RakeTask.new('safari') do |t|
+#   t.rspec_opts = ["--format documentation","--color"]
+#   t.pattern = 'spec/*_spec.rb'
+#   Dotenv.load('dotenv/FirefoxDesktop.env')
+# end
 
 # desc "Test With Chrome iPhone 5 portrait - 320 x 586"
 # RSpec::Core::RakeTask.new('iPhone5Port') do |t|
@@ -68,18 +76,10 @@ end
 #   Dotenv.load('dotenv/ChromeIPadLand.env')
 # end
 
-desc "Test With IE Desktop Browser"
-RSpec::Core::RakeTask.new('ie') do |t|
-  t.rspec_opts = ["--format documentation","--color"]
-  #t.pattern = 'spec/*_spec.rb'
-  t.pattern = 'spec/my_account_spec.rb'
-  Dotenv.load('dotenv/IEDesktop.env')
-end
-
-desc "Test With Edge Desktop Browser"
-RSpec::Core::RakeTask.new('edge') do |t|
-  t.rspec_opts = ["--format documentation","--color"]
-  #t.pattern = 'spec/*_spec.rb'
-  t.pattern = 'spec/dental_services_spec.rb'
-  Dotenv.load('dotenv/EdgeDesktop.env')
-end
+# desc "Test With Edge Desktop Browser"
+# RSpec::Core::RakeTask.new('edge') do |t|
+#   t.rspec_opts = ["--format documentation","--color"]
+#   t.pattern = 'spec/*_spec.rb'
+#   #t.pattern = 'spec/dental_services_spec.rb'
+#   Dotenv.load('dotenv/EdgeDesktop.env')
+# end

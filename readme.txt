@@ -10,3 +10,6 @@ HOW TO RUN:
 INTERNET EXPLORER:
 You must download the IE driver and put it in a location that has been added to $PATH
 Using the x64 version is not recommended as it enters keys really slowly
+
+FIREFOX:
+By default, the script is set to run with a profile named "adblock" to get around foresee, sine adding the foresee cookies doens't seem to work in firefox for some reason.

@@ -30,7 +30,11 @@ class MyAccountPage
 	end
 
 	def form_error_msg()
-		return $test_driver.find_element(:xpath => "//span[@class='form-error active']")
+		return $test_driver.find_element(:xpath => "//form[@id='login-form']/span[@class='form-error active']")
+	end
+
+	def form_uname_msg()
+		return $test_driver.find_element(:xpath => "//form[@id='login-form']/fieldset[@class='grid-whole field-container']/div[@class='input-container']/div[@class='input-wrapper'][1]/span[@class='form-error active']")
 	end
 
 	def forgot_username_link()
@@ -117,7 +121,130 @@ class MyAccountPage
 		return $test_driver.find_element(:xpath => "//div[@id='account-info']/div[@class='contact-info-wrapper grid-third']/p[@class='account-title']/a[@class='logout']")
 	end
 
+	def welcome_text()
+		return $test_driver.find_element(:xpath => "//div[@id='account-info']/div[@class='contact-info-wrapper grid-third']/p[@class='account-title']")
+	end
+
+	def office_details()
+		return $test_driver.find_element(:xpath => "//div[@id='account-info']/div[@class='contact-info-wrapper grid-third']/p[@class='office-details']")
+	end
+
+	def empty_notification()
+		return $test_driver.find_element(:xpath => "//div[@id='account-info']/div[@class='welcome-patient-wrapper grid-two-thirds']/div[@class='appointments-box']/div[@class='notification empty']")
+	end
+
+	#My Account links
+	def my_account_sidebar_link()
+		return $test_driver.find_element(:xpath => "//div[@id='sidebar']/h3/a")
+	end
+
+	def my_account_statements_link()
+		return $test_driver.find_element(:xpath => "//li[@id='statements']/a")
+	end
+	
+	def manage_appointments_link()
+		return $test_driver.find_element(:partial_link_text, "Manage Appointments")
+	end
+
+	def update_password_link()
+		return $test_driver.find_element(:partial_link_text, "Update Password")
+	end
+
 	def make_a_payment_link()
 		return $test_driver.find_element(:partial_link_text, "Make a Payment")
+	end
+
+	#Account information links
+	def account_info_statements()
+		return $test_driver.find_element(:xpath => "//div[@class='content']/div[@class='grid-whole'][1]/div[@class='grid-4'][1]/div[@class='section-block statements-info']/a[@class='title']")
+	end
+
+	#Tools and resources links
+	def tools_manage_appointments()
+		return $test_driver.find_element(:xpath => "//div[@class='content']/div[@class='grid-whole'][1]/div[@class='grid-4'][2]/div[@class='section-block']/a[@class='title']")
+	end
+
+	#My account profile links
+	def profile_update_password_link()
+		return $test_driver.find_element(:xpath => "//div[@class='content']/div[@class='grid-whole'][1]/div[@class='grid-4 middle-grid']/div[@class='section-block']/a[@class='title pencil']")
+	end
+
+	#Make a payment modal
+	def map_modal()
+		return $test_driver.find_element(:xpath => "//div[@class='modal-content grid-two-thirds modal make-payment-modal  modal-global']")
+	end
+
+	def map_account_balance_check()
+		return $test_driver.find_element(:xpath => "//form[@id='account-payment']/div[@class='payment-amount input-wrapper field-container']/div[@class='input-container grid-whole']/fieldset[1]/label")
+	end
+
+	def map_other_amount_check()
+		return $test_driver.find_element(:xpath => "//form[@id='account-payment']/div[@class='payment-amount input-wrapper field-container']/div[@class='input-container grid-whole']/fieldset[2]/label")
+	end
+
+	def map_other_amount_field()
+		return $test_driver.find_element(:id, "input-alternate-amount")
+	end
+
+	def map_billing_info()
+		return $test_driver.find_element(:id, "billing-info")
+	end
+
+	def map_edit_link()
+		return $test_driver.find_element(:id, "change-address-modal")
+	end
+
+	def map_street_address()
+		return $test_driver.find_element(:xpath => "//input[@name='street']")
+	end
+
+	def map_city()
+		return $test_driver.find_element(:xpath => "//input[@name='city']")
+	end
+
+	def map_state()
+		return $test_driver.find_element(:xpath => "//input[@name='state']")
+	end
+
+	def map_zip()
+		return $test_driver.find_element(:xpath => "//input[@name='state']")
+	end
+
+	def map_cancel_address_cta()
+		return $test_driver.find_element(:id, "cancel-change")
+	end
+
+	def map_update_address_cta()
+		return $test_driver.find_element(:id, "update-address")
+	end
+
+	#Update password page
+	def pass_old()
+		return $test_driver.find_element(:id, "forgot-password-old")
+	end
+
+	def pass_new()
+		return $test_driver.find_element(:id, "forgot-password-new")
+	end
+
+	def pass_confirm()
+		return $test_driver.find_element(:id, "forgot-password-confirm")
+	end
+
+	def pass_form_error()
+		return $test_driver.find_element(:xpath => "//form[@id='change-password-form']/fieldset[@class='field-container grid-whole has-error']/span[@class='form-error active']")
+	end
+
+	def pass_submit_cta()
+		return $test_driver.find_element(:id, "submit-change-password")
+	end
+
+	#Statements page
+	def statements()
+		return $test_driver.find_elements(:xpath => "//div[@class='content']/div[@class='grid-whole appointment-list']/div[@class='mobile_list']/div[@class='grid-4']/a")
+	end
+
+	def here_link()
+		return $test_driver.find_element(:xpath => "//div[@class='content']/div[@class='has-statements']/p[@class='current-message']/a")
 	end
 end

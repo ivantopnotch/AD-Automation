@@ -10,7 +10,7 @@ class AspenDental
     case ENV['BROWSER_TYPE']
       when 'FIREFOX'
         #Load adblock profile
-        profile = Selenium::WebDriver::Firefox::Profile.from_name "adblock2"
+        profile = Selenium::WebDriver::Firefox::Profile.from_name "adblock"
         profile['network.http.connection-timeout'] = 5
         Selenium::WebDriver::Firefox.path = ENV['BROWSER_LOCATION']
         return Selenium::WebDriver.for :firefox, :profile => profile

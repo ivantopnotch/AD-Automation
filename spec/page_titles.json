@@ -116,8 +116,12 @@
 
 	"my-account":
 	{
+		"my-account":"My Account",
 		"sign-up":"My Account",
-		"sign-in":"My Account"
+		"sign-in":"My Account",
+		"statements":"Statements",
+		"manage-appointments":"Manage Appointments",
+		"update-password":"Update Password"
 	},
 
 	"office":

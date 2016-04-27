@@ -158,7 +158,7 @@ describe "Dental Services pages functionality" do
 			#Breadcrumbs
 			tc.test_breadcrumbs(breadcrumb[0],"root-canal",breadcrumb[1],"Root Canal")
 			#Links
-			test_link_back(dental_services.overcoming_anxiety_link, title, parsed["what-to-expect"]["overcoming-dental-anxiety"],false,7)
+			test_link_back(dental_services.overcoming_anxiety_link, title, parsed["what-to-expect"]["overcoming-dental-anxiety"],false,10)
 			#Youtube video
 			tc.test_youtube_player()
 			#Closest office container
