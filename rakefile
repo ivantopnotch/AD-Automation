@@ -6,16 +6,16 @@ require 'dotenv'
 desc "Test With Firefox Desktop Browser"
 RSpec::Core::RakeTask.new('firefox') do |t|
   t.rspec_opts = ["--format documentation","--color"]
-  t.pattern = 'spec/*_spec.rb'
-  #t.pattern = 'spec/my_account_spec.rb'
+  #t.pattern = 'spec/*_spec.rb'
+  t.pattern = 'spec/my_account_spec.rb'
   Dotenv.load('dotenv/FirefoxDesktop.env')
 end
 
 desc "Test With Chrome Desktop Browser"
 RSpec::Core::RakeTask.new('chrome') do |t|
   t.rspec_opts = ["--format documentation","--color"]
-  t.pattern = 'spec/*_spec.rb'
-  #t.pattern = 'spec/my_account_spec.rb'
+  #t.pattern = 'spec/*_spec.rb'
+  t.pattern = 'spec/my_account_spec.rb'
   Dotenv.load('dotenv/ChromeDesktop.env')
 end
 

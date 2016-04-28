@@ -371,26 +371,119 @@ describe "My Account functionality" do
 			wait.until { myaccount.map_edit_link.displayed? }
 		end
 
-		# it " - Make a payment billing flow" do
-		# 	$logger.info("Make a payment billing flow")
-		# 	forsee.add_cookies();
-		# 	parsed = JSON.parse(open("spec/page_titles.json").read)
-		# 	login("guarantorNDNA", account_password)
+		it " - Make a payment amount validation" do
+			$logger.info("Make a payment amount validation")
+			forsee.add_cookies();
+			parsed = JSON.parse(open("spec/page_titles.json").read)
+			login("guarantorNDNA", account_password)
 
-		# 	#Open make a payment modal
-		# 	begin
-		# 		myaccount.make_a_payment_link.click
-		# 		wait.until { myaccount.map_modal.displayed? }
-		# 	rescue Selenium::WebDriver::Error::TimeOutError
-		# 		#Try again
-		# 		myaccount.make_a_payment_link.click
-		# 		wait.until { myaccount.map_modal.displayed? }
-		# 	end
+			#Open make a payment modal
+			begin
+				myaccount.make_a_payment_link.click
+				wait.until { myaccount.map_modal.displayed? }
+			rescue Selenium::WebDriver::Error::TimeOutError
+				#Try again
+				myaccount.make_a_payment_link.click
+				wait.until { myaccount.map_modal.displayed? }
+			end
 
-		# 	# myaccount.map_other_amount_check.click
-		# 	# myaccount.map_account_balance_check.click
-		# 	# myaccount.map_other_amount_check.click
-		# 	# myaccount.map_other_amount_field.send_keys("6.79")
-		# end
+			sleep 1
+			myaccount.map_other_amount_check.click
+			myaccount.map_account_balance_check.click
+			myaccount.map_other_amount_check.click
+			myaccount.map_other_amount_field.send_keys("asdf")
+			myaccount.map_submit_cta.click
+			expect(myaccount.map_other_amount_field.attribute("class").include? "is-error").to eql true
+			sleep 1
+			myaccount.map_other_amount_field.clear
+			myaccount.map_other_amount_field.send_keys("6.78")
+			myaccount.map_submit_cta.click
+			expect(myaccount.map_other_amount_field.attribute("class").include? "is-error").to eql false
+		end
+
+		it " - Make a payment billing flow INCOMPLETE" do
+			$logger.info("Make a payment billing flow")
+			forsee.add_cookies();
+			parsed = JSON.parse(open("spec/page_titles.json").read)
+			login("guarantorNDNA", account_password)
+
+			#Open make a payment modal
+			begin
+				myaccount.make_a_payment_link.click
+				wait.until { myaccount.map_modal.displayed? }
+			rescue Selenium::WebDriver::Error::TimeOutError
+				#Try again
+				myaccount.make_a_payment_link.click
+				wait.until { myaccount.map_modal.displayed? }
+			end
+
+			#Check all dropdown items
+			for i in 1 .. 4 
+				sleep 1
+				#Click dropdown
+				myaccount.map_cc_type.click
+				#Click dropdown item
+				wait.until { myaccount.map_cc_type_item(i).displayed? }
+				myaccount.map_cc_type_item(i).click
+				#Have to click another element before the next go-around
+				js_scroll_up(myaccount.map_cc_picture(1),true)
+				wait.until { myaccount.map_cc_picture(1).displayed? }
+				myaccount.map_cc_picture(1).click
+			end
+
+			# #Invalid CC number
+			sleep 1
+			myaccount.map_cc_no.send_keys("asl;dkfas;f")
+			myaccount.map_submit_cta.click
+			wait.until { myaccount.map_cc_no.attribute("class").include? "is-error" }
+			#Valid CC number
+			sleep 1
+			myaccount.map_cc_no.clear
+			myaccount.map_cc_no.send_keys("4111111111111111")
+			myaccount.map_submit_cta.click
+			wait.until { !myaccount.map_cc_no.attribute("class").include? "is-error" }
+
+			#Invalid CVV
+			sleep 1
+			myaccount.map_cc_cvv.send_keys("asd")
+			myaccount.map_submit_cta.click
+			wait.until { myaccount.map_cc_cvv_error.displayed? }
+			#Valid CVV
+			sleep 1
+			myaccount.map_cc_cvv_error.clear
+			myaccount.map_cc_cvv_error.send_keys("123")
+			myaccount.map_submit_cta.click
+			wait.until { myaccount.map_cc_cvv.displayed? }
+
+			#Invalid expiration date (defaults to invalid)
+			sleep 1
+			myaccount.map_submit_cta.click
+			wait.until { myaccount.map_cc_date_error.displayed? }
+		end
+
+		it " - Account Message DNI" do
+			$logger.info("Account Message DNI")
+			forsee.add_cookies();
+			parsed = JSON.parse(open("spec/page_titles.json").read)
+			login("guarantorNDNA", account_password)
+
+			myaccount.tools_manage_appointments.click
+			wait.until { $test_driver.title.include? parsed["my-account"]["manage-appointments"] }
+
+			# if myaccount.ma_phone_number.text != "(877) 929-0874"
+			# 	fail("Default DNI number did not match, was instead: " + myaccount.ma_phone_number.text)
+			# end
+			base_url = $test_driver.current_url
+			utm_sources = ["google","yp","yelp","yahoo","bing"]
+			dni_numbers = ["(877) 277-4354","(877) 277-4403","(877) 929-0874","(877) 277-4441","(877) 277-4403"]
+			for i in 0 .. dni_numbers.length-1
+				$test_driver.navigate.to(base_url + "?utm_source=" + utm_sources[i])
+				wait.until { myaccount.ma_phone_number.displayed? }
+				sleep 1 #Give time for phone no. to switch dynamically
+				if myaccount.ma_phone_number.text != dni_numbers[i]
+					fail(utm_sources[i] + " DNI number did not match, was instead: " + myaccount.ma_phone_number.text)
+				end
+			end
+		end
 	end
 end

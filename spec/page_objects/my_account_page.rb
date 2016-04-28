@@ -218,6 +218,51 @@ class MyAccountPage
 		return $test_driver.find_element(:id, "update-address")
 	end
 
+	#Credit card stuff
+	def map_cc_type()
+		return $test_driver.find_element(:xpath => "//div[@id='dk_container_card-type']/a[@class='dk_toggle']")
+	end
+
+	def map_cc_type_item(i)
+		return $test_driver.find_element(:xpath => "//div[@id='dk_container_card-type']/div[@class='dk_options']/ul[@class='dk_options_inner']/li["+i.to_s+"]/a")
+	end
+
+	def map_cc_picture(i)
+		return $test_driver.find_element(:xpath => "//div[@class='card-type-wrapper card-container']/ul[@class='payment-methods']/li["+i.to_s+"]")
+	end
+
+	def map_cc_no()
+		return $test_driver.find_element(:id, "card-number")
+	end
+
+	def map_cc_month()
+		return $test_driver.find_element(:id, "dk_container_card-month")
+	end
+
+	def map_cc_year()
+		return $test_driver.find_element(:id, "dk_container_card-year")
+	end
+
+	def map_cc_cvv()
+		return $test_driver.find_element(:xpath => "//div[@class='input-container grid-whole']/input[@class='text-field security-code']")
+	end
+
+	def map_cc_cvv_error()
+		return $test_driver.find_element(:xpath => "//div[@class='input-container grid-whole']/input[@class='text-field security-code is-error']")
+	end
+
+	def map_cc_date_error()
+		return $test_driver.find_element(:xpath => "//div[@class='partial-content-box payment-data']/fieldset[@class='expiration-wrapper']/span[@class='form-error active']")
+	end
+
+	def map_cancel_cta()
+		return $test_driver.find_element(:id, "cancel-payment")
+	end
+
+	def map_submit_cta()
+		return $test_driver.find_element(:id, "submit-payment")
+	end
+
 	#Update password page
 	def pass_old()
 		return $test_driver.find_element(:id, "forgot-password-old")
@@ -246,5 +291,10 @@ class MyAccountPage
 
 	def here_link()
 		return $test_driver.find_element(:xpath => "//div[@class='content']/div[@class='has-statements']/p[@class='current-message']/a")
+	end
+
+	#Manage appointments page
+	def ma_phone_number()
+		return $test_driver.find_element(:xpath => "//strong[@class='near-office-phone']/span[@class='telephone']")
 	end
 end

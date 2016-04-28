@@ -12,4 +12,7 @@ You must download the IE driver and put it in a location that has been added to 
 Using the x64 version is not recommended as it enters keys really slowly
 
 FIREFOX:
-By default, the script is set to run with a profile named "adblock" to get around foresee, sine adding the foresee cookies doens't seem to work in firefox for some reason.
+By default, the script is set to run with a profile named "adblock" (which has an adblocking addon installed) to get around foresee, since manually adding the foresee cookies doesn't seem to work in firefox for some reason.
+
+CHROME:
+Chrome driver is included. Should run without issue
