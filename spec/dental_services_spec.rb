@@ -153,12 +153,12 @@ describe "Dental Services pages functionality" do
 			$logger.info("Root Canal page")
 			forsee.add_cookies()
 			parsed = JSON.parse(open("spec/page_titles.json").read)
-			title = parsed["dental-services"]["root-canal-cost"]
+			title = parsed["dental-services"]["root-canal"]
 			tc.navigate_header(1,6,parsed["dental-services"]["root-canal"])
 			#Breadcrumbs
 			tc.test_breadcrumbs(breadcrumb[0],"root-canal",breadcrumb[1],"Root Canal")
 			#Links
-			test_link_back(dental_services.overcoming_anxiety_link, title, parsed["what-to-expect"]["overcoming-dental-anxiety"],false,10)
+			test_link_back(dental_services.overcoming_anxiety_link, title, parsed["what-to-expect"]["overcoming-dental-anxiety"])
 			#Youtube video
 			tc.test_youtube_player()
 			#Closest office container
@@ -169,12 +169,12 @@ describe "Dental Services pages functionality" do
 			$logger.info("Root Canal Cost page")
 			forsee.add_cookies()
 			parsed = JSON.parse(open("spec/page_titles.json").read)
-			title = parsed["dental-services"]["root-canal"]
-			tc.navigate_header(1,6,title)
+			title = parsed["dental-services"]["root-canal-cost"]
+			tc.navigate_header(1,6,parsed["dental-services"]["root-canal"])
 			#Click sidebar sub-link
 			wait.until { tcp.sidebar_sub_link(1).displayed? }
 			tcp.sidebar_sub_link(1).click
-		  	wait.until { $test_driver.title.include? title }
+			wait.until { $test_driver.title.include? title }
 			#Breadcrumbs
 			tc.test_breadcrumbs(breadcrumb[0],"root-canal",breadcrumb[1],"Root Canal","root-canal-cost","Root Canal Cost")
 			#Links
