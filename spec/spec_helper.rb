@@ -146,7 +146,7 @@ def test_link_tab(link, expected_title = nil, expected_url = nil)
   #Test it for URL or title
   begin
     if expected_title == nil
-      wait.until { $test_driver.current_url.include? expected_url }
+      wait.until { $test_driver.current_url.downcase.include? expected_url.downcase }
     elsif expected_url == nil
       wait.until { $test_driver.title.include? expected_title }
     else
