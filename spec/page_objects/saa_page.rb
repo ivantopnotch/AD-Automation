@@ -82,14 +82,14 @@ class SaaPage
 
 
 	def primary_reason_dropdown()
-		return $test_driver.find_element(:class, "appointment-reason-form").find_element(:xpath => "//label/div[@id='dk_container_new-patient-appointment-select']/a[@class='dk_toggle']")
+		return $test_driver.find_element(:id, "dk0-combobox")
 	end
 
 	def primary_reason_item(number = nil)
 		if number == nil
 			number = rand(2..7)
 		end
-		return $test_driver.find_element(:class, "dk_options").find_element(:xpath => "//ul[@class='dk_options_inner']/li["+number.to_s+"]/a")
+		return $test_driver.find_element(:xpath => "//ul[@id='dk0-listbox']/li["+number.to_s+"]")
 	end
 
 	def reason_error()

@@ -88,6 +88,7 @@ describe "Dentures pages functionality" do
 			#Test page links
 			test_link_back(dentures.compare_dentures_cta,title,parsed["dentures"]["types-of-dentures"])
 			test_link_back(dentures.money_back1_link,title,parsed["what-to-expect"]["peace-of-mind-promise"])
+			js_scroll_up(dentures.denture_lab_link)
 			test_link_back(dentures.denture_lab_link,title,parsed["dentures"]["dentures-made-affordable"])
 			test_link_back(dentures.money_back2_link,title,parsed["what-to-expect"]["peace-of-mind-promise"])
 			test_link_back(dentures.warranty_link,title,parsed["dentures"]["denture-warranties"])
@@ -132,6 +133,7 @@ describe "Dentures pages functionality" do
 			tc.test_breadcrumbs("dentures","dentures-made-affordable","Dentures","Dentures Made Affordable")
 
 			test_link_back(dentures.local_office_link,title,parsed["office"]["pricing-offers"])
+			js_scroll_up(dentures.denture_offer)
 			test_link_back(dentures.denture_offer,title,parsed["office"]["pricing-offers"])
 			test_link_back(dentures.click_here_link,title,parsed["office"]["insurance-financing"])
 
@@ -220,6 +222,7 @@ describe "Dentures pages functionality" do
 
 			test_link_back(dentures.basic_link,title,parsed["dentures"]["basic-full"])
 			test_link_back(dentures.classic_link,title,parsed["dentures"]["classic-full"])
+			js_scroll_up(dentures.naturalytes_link2)
 			test_link_back(dentures.naturalytes_link2,title,parsed["dentures"]["naturalytes"])
 			test_link_back(dentures.comfilytes_link2,title,parsed["dentures"]["comfilytes"])
 			test_link_back(dentures.flexilytes_combo_link2,title,parsed["dentures"]["flexilytes-combo"])

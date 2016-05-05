@@ -277,6 +277,7 @@ describe "Dental Services pages functionality" do
 			#Breadcrumbs
 			tc.test_breadcrumbs(breadcrumb[0],"cosmetic-dentistry",breadcrumb[1],"Cosmetic Dentistry")
 			#Links
+			js_scroll_up(dental_services.teeth_whitening_link)
 			test_link_back(dental_services.teeth_whitening_link, title, parsed["dental-services"]["teeth-whitening"])
 			test_link_back(dental_services.veneers_link, title, parsed["dental-services"]["dental-veneers"])
 			#Youtube video

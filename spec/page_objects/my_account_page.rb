@@ -220,11 +220,11 @@ class MyAccountPage
 
 	#Credit card stuff
 	def map_cc_type()
-		return $test_driver.find_element(:xpath => "//div[@id='dk_container_card-type']/a[@class='dk_toggle']")
+		return $test_driver.find_element(:id, "dk0-combobox")
 	end
 
-	def map_cc_type_item(i)
-		return $test_driver.find_element(:xpath => "//div[@id='dk_container_card-type']/div[@class='dk_options']/ul[@class='dk_options_inner']/li["+i.to_s+"]/a")
+	def map_cc_type_item(cc_name)
+		return $test_driver.find_element(:id, "dk0-" + cc_name)
 	end
 
 	def map_cc_picture(i)
@@ -244,15 +244,27 @@ class MyAccountPage
 	end
 
 	def map_cc_cvv()
-		return $test_driver.find_element(:xpath => "//div[@class='input-container grid-whole']/input[@class='text-field security-code']")
-	end
-
-	def map_cc_cvv_error()
-		return $test_driver.find_element(:xpath => "//div[@class='input-container grid-whole']/input[@class='text-field security-code is-error']")
+		return $test_driver.find_element(:class, "security-code")
 	end
 
 	def map_cc_date_error()
 		return $test_driver.find_element(:xpath => "//div[@class='partial-content-box payment-data']/fieldset[@class='expiration-wrapper']/span[@class='form-error active']")
+	end
+
+	def map_cc_month()
+		return $test_driver.find_element(:id, "dk1-combobox")
+	end
+
+	def map_cc_month_item(i) #Must include trailing zero; therefor it should be a string
+		return $test_driver.find_element(:id, "dk1-" + i)
+	end
+
+	def map_cc_year()
+		return $test_driver.find_element(:id, "dk2-combobox")
+	end
+
+	def map_cc_year_item(i) # i = year (e.g. 2017)
+		return $test_driver.find_element(:id, "dk2-" + i.to_s)
 	end
 
 	def map_cancel_cta()
@@ -286,7 +298,7 @@ class MyAccountPage
 
 	#Statements page
 	def statements()
-		return $test_driver.find_elements(:xpath => "//div[@class='content']/div[@class='grid-whole appointment-list']/div[@class='mobile_list']/div[@class='grid-4']/a")
+		return $test_driver.find_elements(:xpath => "//div[@class='content']/div[@class='grid-whole appointment-list']/div[@class='mobile_list']/div[@class='grid-4']/a/p")
 	end
 
 	def here_link()
@@ -296,5 +308,76 @@ class MyAccountPage
 	#Manage appointments page
 	def ma_phone_number()
 		return $test_driver.find_element(:xpath => "//strong[@class='near-office-phone']/span[@class='telephone']")
+	end
+
+	def reschedule_cta()
+		return $test_driver.find_element(:partial_link_text, "Reschedule")
+	end
+
+	def reschedule_ctas()
+		return $test_driver.find_elements(:partial_link_text, "Reschedule")
+	end
+
+	def reschedule_modal()
+		return $test_driver.find_element(:id, "reschedule-appointment")
+	end
+
+	def reschedule_office_links()
+		return $test_driver.find_elements(:class, "appointment-detail-title")
+	end
+
+	def reschedule_days(row, column)
+		return $test_driver.find_element(:xpath => "//table[@class='ui-datepicker-calendar']/tbody/tr["+row.to_s+"]/td["+column.to_s+"]")
+	end
+
+	def reschedule_times(row, column)
+		return $test_driver.find_element(:xpath => "//div[@id='appointment-time']/div[@class='grid-half']["+column.to_s+"]/ol/li["+row.to_s+"]/a")
+	end
+
+	#Used for checking success
+	def reschedule_apt_time()
+		return $test_driver.find_element(:xpath => "//form[@id='reschedule-appointment']/div[@class='content-box']/div[@class='upcoming-info']/div[@class='patient-info grid-whole']/div[@class='grid-half'][1]/p[@class='schedule-time']")
+	end
+
+	def reschedule_submit_cta()
+		return $test_driver.find_element(:class, "save-link")
+	end
+
+	def reschedule_google_cal_link()
+		return $test_driver.find_element(:partial_link_text, "Add to Google Calendar")
+	end
+
+	def reschedule_google_map_link()
+		return $test_driver.find_element(:partial_link_text, "Get Directions")
+	end
+
+	def reschedule_close_cta()
+		return $test_driver.find_element(:class, "confirm-close")
+	end
+
+	#Cancel appointment
+	def cancel_links()
+		return $test_driver.find_elements(:class, "cancel-link")
+	end
+
+	def cancel_modal()
+		return $test_driver.find_element(:id, "cancel-appointment")
+	end
+
+	def cancel_close_link()
+		return $test_driver.find_element(:class, "close-link")
+	end
+
+	def cancel_reschedule_cta()
+		return $test_driver.find_element(:xpath => "//form[@id='cancel-appointment']/div[@class='content-box upcoming-info cancel-modal']/div[2]/button[@class='button cancel-reschedule reschedule-link']")
+	end
+
+	def cancel_reason_dropdown()
+		return $test_driver.find_element(:id, "dk0-combobox")
+	end
+
+	#Letter must be capital, A - F
+	def cancel_reason_dropdown_items(letter)
+		return $test_driver.find_element(:id, "dk0-" + letter)
 	end
 end

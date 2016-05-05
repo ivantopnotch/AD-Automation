@@ -31,11 +31,6 @@ describe "Epsilon sign-up page functionality" do
 			sleep scroll_sleep_time
 			expect($test_driver.title.include? "Signup")
 
-			#Setting cookies doesn't work for firefox
-			# if ENV['BROWSER_TYPE'] == 'FIREFOX'
-			# 	forsee.wait_close_modal()
-			# end
-
 			$logger.info("First name")
 			#Check invalid input
 			#Errors will include "is-error" in class name

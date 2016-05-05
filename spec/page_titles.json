@@ -5,7 +5,7 @@
 		"SAA":"Schedule",
 		"FAO":"Find a Dental Office",
 		"search":"Search",
-		"my-account":"My Account",
+		"my-account":"Login",
 		"dental-services":"Dental Health Services",
 		"dentures":"Dentures",
 		"pricing-offers":"Dental Pricing & Offers",
@@ -135,7 +135,7 @@
 	"misc":
 	{
 		"patient-forms":"Patient Forms",
-		"sign-up":"Sign Up",
+		"sign-up":"Sign up",
 		"terms-of-use":"Terms of Use",
 		"privacy-policy":"Privacy Policy"
 	}

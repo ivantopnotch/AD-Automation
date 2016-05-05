@@ -18,11 +18,10 @@ def test_dropdown(header, drop_no, page_titles)
 	    	#Try again
 	    	$test_driver.action.move_to(header.dropdown(drop_no)).perform
 		end
-		#Click link
-		header.dropdown_link(drop_no,i+1).click
 
-		#Check page title
+		#Click link and check page title
 		begin
+			header.dropdown_link(drop_no,i+1).click
 			wait.until { $test_driver.title.include? page_titles[i] }
 		rescue Selenium::WebDriver::Error::TimeOutError
 			fail("Error loading page " + page_titles[i])

@@ -25,11 +25,11 @@ class EpsilonPage
 	end
 
 	def select_month()
-		return $test_driver.find_element(:class, "dk_toggle")
+		return $test_driver.find_element(:id, "dk0-combobox")
 	end
 
-	def month_option()
-		return $test_driver.find_element(:id, "dk_container_date").find_element(:xpath => "//div[@class='dk_options']/ul[@class='dk_options_inner']/li[12]/a")
+	def month_option(i = 8)
+		return find_element(:id, "dk0-" + i.to_s)
 	end
 
 	def month_error()

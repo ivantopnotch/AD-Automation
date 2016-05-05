@@ -23,8 +23,7 @@ class AspenDental
         # Selenium::WebDriver::Chrome::Service.executable_path = File.join(Dir.pwd, ENV['BROWSER_LOCATION'])
         return Selenium::WebDriver.for :ie
       when 'EDGE'
-        caps = Selenium::WebDriver::Remote::Capabilities.edge
-        return Selenium::WebDriver.for :remote, url: "http://10.0.9.218:4444/wd/hub", desired_capabilities: caps
+        return Selenium::WebDriver.for :edge
       else
         ENV['BROWSER_TYPE'] = 'FIREFOX'
         profile = Selenium::WebDriver::Firefox::Profile.new

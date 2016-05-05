@@ -31,10 +31,17 @@ class TwoColumnSpec
 	    	#Try again
 	   		$test_driver.action.move_to(header.dropdown(drop_no)).perform
 		end
-		#Click dropdown item
-		header.dropdown_link(drop_no,link_no).click
-		#Check title
-		@wait.until { $test_driver.title.include? expected_title }
+
+		begin
+			#Click dropdown item
+			header.dropdown_link(drop_no,link_no).click
+			#Check title
+			@wait.until { $test_driver.title.include? expected_title }
+		rescue Selenium::WebDriver::Error::TimeOutError
+			#Try again
+			header.dropdown_link(drop_no,link_no).click
+			@wait.until { $test_driver.title.include? expected_title }
+		end
 	end
 
 	def test_closest_office_details(parent_title, sleep_after_back = false)
@@ -164,8 +171,11 @@ class TwoColumnSpec
 
 
 	def test_youtube_player()
+		#IE doesn't like this at all
+		if ENV['BROWSER_TYPE'] == 'IE'
+			return
+		end
 		$logger.info("Youtube video")
-		#switch to youtube iframe
 
 		#Give firefox a minute, he's a little... slow
 		if ENV['BROWSER_TYPE'] == 'FIREFOX'

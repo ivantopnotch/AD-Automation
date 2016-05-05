@@ -22,6 +22,7 @@ end
 
 describe "Footer functionality" do
 	footer = FooterPage.new()
+	forsee = ForseePage.new()
 	scroll_sleep_time = 3
 	wait = Selenium::WebDriver::Wait.new(timeout: 3)
 
@@ -32,6 +33,7 @@ describe "Footer functionality" do
 		parsed = JSON.parse(open("spec/page_titles.json").read)
 
 		it " - Social media links" do
+			forsee.add_cookies()
 			$logger.info("Social media links")
 
 			$logger.info("Blog link")
@@ -78,6 +80,7 @@ describe "Footer functionality" do
 		end
 
 		it " - Dental services links" do
+			forsee.add_cookies()
 			$logger.info("Dental services links")
 			#Heading
 			footer.dental_services_link.click
@@ -91,6 +94,7 @@ describe "Footer functionality" do
 		end
 
 		it " - Dentures links" do
+			forsee.add_cookies()
 			$logger.info("Dentures links")
 			footer.dentures_link.click
 			wait.until { $test_driver.title.include? parsed["top-pages"]["dentures"] }
@@ -112,6 +116,7 @@ describe "Footer functionality" do
 		end
 
 		it " - Pricing and offers link" do
+			forsee.add_cookies()
 			$logger.info("Pricing and offers link")
 			footer.pricing_and_offers_link.click
 			wait.until { $test_driver.title.include? parsed["top-pages"]["pricing-offers"] }
@@ -120,12 +125,14 @@ describe "Footer functionality" do
 		end
 
 		it " - Patient reviews link" do
+			forsee.add_cookies()
 			$logger.info("Patient reviews link")
 			footer.patient_reviews_link.click
 			wait.until { $test_driver.title.include? parsed["top-pages"]["reviews"] }
 		end
 
 		it " - What to expect links" do
+			forsee.add_cookies()
 			$logger.info("What to expect links")
 			footer.what_to_expect_link.click
 			wait.until { $test_driver.title.include? parsed["top-pages"]["what-to-expect"] }
@@ -133,12 +140,14 @@ describe "Footer functionality" do
 		end
 
 		it " - Patient forms (cat) link" do
+			forsee.add_cookies()
 			$logger.info("Patient forms (cat) link")
 			footer.patient_forms_cat_link.click
 			wait.until { $test_driver.title.include? "Patient Forms" }
 		end
 
 		it " - Oral health links" do
+			forsee.add_cookies()
 			$logger.info("Oral health links")
 			footer.oral_health_link.click
 			wait.until { $test_driver.title.include? parsed["top-pages"]["oral-health"] }
@@ -148,30 +157,35 @@ describe "Footer functionality" do
 		end
 
 		it " - About link" do
+			forsee.add_cookies()
 			$logger.info("About link")
 			footer.about_link.click
 			wait.until { $test_driver.title.include? parsed["top-pages"]["about"] }
 		end
 
 		it " - FAQ link" do
+			forsee.add_cookies()
 			$logger.info("FAQ link")
 			footer.faq_link.click
 			wait.until { $test_driver.title.include? parsed["top-pages"]["faqs"] }
 		end
 
 		it " - My account link" do
+			forsee.add_cookies()
 			$logger.info("My account link")
 			footer.my_account_link.click
 			wait.until { $test_driver.title.include? parsed["top-pages"]["my-account"] }
 		end
 
 		it " - Contact us link" do
+			forsee.add_cookies()
 			$logger.info("Contact us link")
 			footer.contact_us_link.click
 			wait.until { $test_driver.title.include? parsed["about"]["contact"] }
 		end
 
 		it " - Visit our job site link" do
+			forsee.add_cookies()
 			$logger.info("'Visit our job site' link")
 			footer.job_site_link.click
 			$test_driver.switch_to.window( $test_driver.window_handles.last )
@@ -179,30 +193,35 @@ describe "Footer functionality" do
 		end
 
 		it " - Sign up CTA" do
+			forsee.add_cookies()
 			$logger.info("Sign up CTA")
 			footer.sign_up_cta.click
 			wait.until { $test_driver.title.include? parsed["misc"]["sign-up"] }
 		end
 
 		it " - Privacy policy link" do
+			forsee.add_cookies()
 			$logger.info("Privacy policy link")
 			footer.privacy_policy_link.click
 			wait.until { $test_driver.title.include? parsed["misc"]["privacy-policy"] }
 		end
 
 		it " - Terms of Use link" do
+			forsee.add_cookies()
 			$logger.info("Terms of Use link")
 			footer.terms_of_use_link.click
 			wait.until { $test_driver.title.include? parsed["misc"]["terms-of-use"] }
 		end
 
 		it " - Site Map link" do
+			forsee.add_cookies()
 			$logger.info("Site Map link")
 			footer.site_map_link.click
 			wait.until { $test_driver.title.include? parsed["top-pages"]["site-map"] }
 		end
 
 		it " - Office listings link" do
+			forsee.add_cookies()
 			$logger.info("Office listings link")
 			footer.office_listings_link.click
 			wait.until { $test_driver.title.include? parsed["top-pages"]["office-listings"] }

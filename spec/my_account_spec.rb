@@ -15,11 +15,26 @@ def login(username, password)
 		myaccount.login_form.submit
 		wait_long.until { myaccount.make_a_payment_link.displayed? }
 	rescue Selenium::WebDriver::Error::TimeOutError
-		#Try again
+		#Try again (thanks chrome)
 		myaccount.username_field.send_keys(username)
 		myaccount.password_field.send_keys(password)
 		myaccount.login_form.submit
 		wait_long.until { myaccount.make_a_payment_link.displayed? }
+	end
+end
+
+def open_map_modal()
+	#Open make a payment modal
+	myaccount = MyAccountPage.new()
+	wait = Selenium::WebDriver::Wait.new(timeout: 3)
+	begin
+		js_scroll_up(myaccount.make_a_payment_link)
+		myaccount.make_a_payment_link.click
+		wait.until { myaccount.map_modal.displayed? }
+	rescue Selenium::WebDriver::Error::TimeOutError
+		js_scroll_up(myaccount.make_a_payment_link)
+		myaccount.make_a_payment_link.click
+		wait.until { myaccount.map_modal.displayed? }
 	end
 end
 
@@ -29,6 +44,7 @@ describe "My Account functionality" do
 	header = HeaderPage.new()
 	scroll_sleep_time = 3
 	wait = Selenium::WebDriver::Wait.new(timeout: 3)
+	wait_long = Selenium::WebDriver::Wait.new(timeout: 20)
 	account_password = "Aspen123!"
 
 	describe " - User can use My Account section correctly" do
@@ -47,7 +63,7 @@ describe "My Account functionality" do
 			myaccount.password_field.send_keys("adsfjkl")
 			#myaccount.sign_in_cta.click
 			myaccount.login_form.submit
-			wait.until { myaccount.form_error_msg.displayed? }
+			wait_long.until { myaccount.form_error_msg.displayed? }
 
 			#Invalid username, valid password
 			myaccount.username_field.clear
@@ -74,7 +90,7 @@ describe "My Account functionality" do
 			myaccount.password_field.send_keys(account_password)
 			#myaccount.sign_in_cta.click
 			myaccount.login_form.submit
-			Selenium::WebDriver::Wait.new(timeout: 5, message: "My Account page failed to load in time after signing in").until { myaccount.sign_out_link.displayed? }
+			Selenium::WebDriver::Wait.new(timeout: 15, message: "My Account page failed to load in time after signing in").until { myaccount.sign_out_link.displayed? }
 		end
 
 		it " - Forgot username flow" do
@@ -230,6 +246,7 @@ describe "My Account functionality" do
 			login("guarantorNDNA", account_password)
 
 			#Navigate to update password page
+			js_scroll_up(myaccount.update_password_link)
 			myaccount.update_password_link.click
 			wait.until { $test_driver.title.include? parsed["my-account"]["update-password"] }
 
@@ -237,6 +254,7 @@ describe "My Account functionality" do
 			myaccount.pass_old.send_keys(account_password)
 			myaccount.pass_new.send_keys("Aa123!")
 			myaccount.pass_confirm.send_keys("Aa123!")
+			js_scroll_up(myaccount.pass_submit_cta)
 			myaccount.pass_submit_cta.click
 			#Check error message
 			expect(myaccount.pass_form_error.attribute("innerHTML").include? "at least 8 characters").to eql true
@@ -268,38 +286,126 @@ describe "My Account functionality" do
 			myaccount.my_account_statements_link.click
 			wait.until { $test_driver.title.include? parsed["my-account"]["statements"] }
 
-			puts "Checking statement PDF links"
-			myaccount.statements.each do |statement|
-				#Make sure statement PDF links are valid
-				expect(Net::HTTP.get_response(URI(statement.attribute("href"))).code_type == Net::HTTPOK).to eql true
+			if ENV['BROWSER_TYPE'] == "chrome"
+				myaccount.statements.each do |statement|
+					#Make sure statement PDF links are valid
+					test_link_tab(statement, nil, statement.attribute("href"))
+				end
 			end
 
 			#Check link to adobe site
 			wait.until { myaccount.here_link.displayed? }
 			js_scroll_up(myaccount.here_link, true)
-			myaccount.here_link.click
-			$test_driver.switch_to.window( $test_driver.window_handles.last )
-			wait.until { $test_driver.current_url.include? "get.adobe.com/reader" }
-			#Close tab that was opened
-			if ENV['BROWSER_TYPE'] == 'IE'
-				$test_driver.execute_script("window.open('', '_self', ''); window.close();")
-			else
-				$test_driver.execute_script("window.close();")
-			end
-			$test_driver.switch_to.window( $test_driver.window_handles.first )
+			test_link_tab(myaccount.here_link, nil, "get.adobe.com/reader")
 		end
 
-		it " - Manage appointments page" do
-			$logger.info("Manage appointments page")
+		it " - Reschedule appointment" do
+			$logger.info("Reschedule appointment")
 			forsee.add_cookies();
 			parsed = JSON.parse(open("spec/page_titles.json").read)
-			login("Stateme1", account_password)
+			title = parsed["my-account"]["manage-appointments"]
+			login("GuarantorW50", account_password)
 
-			#Navigate to update password page
+			#Verify reschedule cta
+			expect(myaccount.reschedule_cta.displayed?).to eql true
+
+			#Navigate to page
+			js_scroll_up(myaccount.manage_appointments_link)
 			myaccount.manage_appointments_link.click
-			wait.until { $test_driver.title.include? parsed["my-account"]["manage-appointments"] }
+			wait.until { $test_driver.title.include? title }
 
-			#TODO: Finish this section once accounts with appointments are available
+			#Pick a random appointment
+			apt_no = rand(0 .. myaccount.reschedule_ctas.length)
+			test_link_back(myaccount.reschedule_office_links[apt_no],title,parsed["office"]["about-office"])
+
+			#Open modal
+			expect(myaccount.reschedule_ctas[apt_no].displayed?).to eql true
+			myaccount.reschedule_ctas[apt_no].click
+			wait.until { myaccount.reschedule_modal.displayed? }
+
+			#Wait until days are displayed
+			wait_long.until { myaccount.reschedule_days(1,1).displayed? }
+			#Click all days
+			for i in 1 .. 5
+				for j in 1 .. 7
+					myaccount.reschedule_days(i,j).click
+				end
+			end
+
+			#Click all times
+			wait.until { myaccount.reschedule_times(3,4).displayed? }
+
+			for i in 1 .. 9
+				for j in 1 .. 2
+					begin
+						myaccount.reschedule_times(i,j).click
+					#Account for unavailable times
+					rescue Selenium::WebDriver::Error::NoSuchElementError
+						next
+					end
+				end
+			end
+
+			#Submit and check success
+			myaccount.reschedule_submit_cta.click
+			wait_long.until { myaccount.reschedule_apt_time.displayed? }
+
+			#Check links
+			test_link_tab(myaccount.reschedule_google_cal_link,"Calendar")
+			test_link_tab(myaccount.reschedule_google_map_link,"Google Maps")
+
+			#Close modal
+			myaccount.reschedule_close_cta.click
+			begin
+				wait_for_disappear(myaccount.reschedule_apt_time, 4)
+			rescue Selenium::WebDriver::Error::NoSuchElementError
+				#This is what we want
+			end
+		end
+
+		it " - Cancel appointment modal" do
+			$logger.info("Cancel appointment modal")
+			forsee.add_cookies();
+			parsed = JSON.parse(open("spec/page_titles.json").read)
+			title = parsed["my-account"]["manage-appointments"]
+			login("GuarantorW50", account_password)
+
+			#Navigate to page
+			js_scroll_up(myaccount.manage_appointments_link)
+			myaccount.manage_appointments_link.click
+			wait.until { $test_driver.title.include? title }
+
+			#Pick a random appointment
+			apt_no = rand(0 .. myaccount.reschedule_ctas.length)
+			#Open modal
+			js_scroll_up(myaccount.cancel_links[apt_no])
+			myaccount.cancel_links[apt_no].click
+			wait.until { myaccount.cancel_modal.displayed? }
+
+			#Click all reasons
+			sleep 1
+			options = ["A","B","C","D","E","F"]
+			for i in 0 .. options.length-1
+				myaccount.cancel_reason_dropdown.click
+				myaccount.cancel_reason_dropdown_items(options[i]).click
+				expect(myaccount.cancel_reason_dropdown_items(options[i]).attribute("aria-selected") == "true").to eql true
+			end
+
+			if ENV['BROWSER_TYPE'] != 'IE' #IE doesn't like this part for some reason
+				#Close modal
+				myaccount.cancel_close_link.click
+				wait_for_disappear(myaccount.cancel_modal,3)
+
+				#Re-open modal
+				js_scroll_up(myaccount.cancel_links[apt_no])
+				myaccount.cancel_links[apt_no].click
+				wait.until { myaccount.cancel_modal.displayed? }
+			end
+
+			#Click reschedule CTA
+			sleep 1
+			myaccount.cancel_reschedule_cta.click
+			wait.until { myaccount.reschedule_modal.displayed? }
 		end
 
 		it " - My Account (dependant) page" do
@@ -327,15 +433,7 @@ describe "My Account functionality" do
 			parsed = JSON.parse(open("spec/page_titles.json").read)
 			login("guarantorNDNA", account_password)
 
-			#Open make a payment modal
-			begin
-				myaccount.make_a_payment_link.click
-				wait.until { myaccount.map_modal.displayed? }
-			rescue Selenium::WebDriver::Error::TimeOutError
-				#Try again
-				myaccount.make_a_payment_link.click
-				wait.until { myaccount.map_modal.displayed? }
-			end
+			open_map_modal()
 
 			expect(myaccount.map_billing_info.displayed?).to eql true
 			myaccount.map_edit_link.click
@@ -377,15 +475,7 @@ describe "My Account functionality" do
 			parsed = JSON.parse(open("spec/page_titles.json").read)
 			login("guarantorNDNA", account_password)
 
-			#Open make a payment modal
-			begin
-				myaccount.make_a_payment_link.click
-				wait.until { myaccount.map_modal.displayed? }
-			rescue Selenium::WebDriver::Error::TimeOutError
-				#Try again
-				myaccount.make_a_payment_link.click
-				wait.until { myaccount.map_modal.displayed? }
-			end
+			open_map_modal()
 
 			sleep 1
 			myaccount.map_other_amount_check.click
@@ -401,30 +491,23 @@ describe "My Account functionality" do
 			expect(myaccount.map_other_amount_field.attribute("class").include? "is-error").to eql false
 		end
 
-		it " - Make a payment billing flow INCOMPLETE" do
-			$logger.info("Make a payment billing flow")
+		it " - Make a payment billing validation" do
+			$logger.info("Make a payment billing ")
 			forsee.add_cookies();
 			parsed = JSON.parse(open("spec/page_titles.json").read)
 			login("guarantorNDNA", account_password)
 
-			#Open make a payment modal
-			begin
-				myaccount.make_a_payment_link.click
-				wait.until { myaccount.map_modal.displayed? }
-			rescue Selenium::WebDriver::Error::TimeOutError
-				#Try again
-				myaccount.make_a_payment_link.click
-				wait.until { myaccount.map_modal.displayed? }
-			end
+			open_map_modal()
 
-			#Check all dropdown items
-			for i in 1 .. 4 
+			#Check all credit card types dropdown items
+			cards = ["Visa","MasterCard","AmEx","Discover"]
+			for i in 0 .. cards.length-1
 				sleep 1
 				#Click dropdown
 				myaccount.map_cc_type.click
 				#Click dropdown item
-				wait.until { myaccount.map_cc_type_item(i).displayed? }
-				myaccount.map_cc_type_item(i).click
+				wait.until { myaccount.map_cc_type_item(cards[i]).displayed? }
+				myaccount.map_cc_type_item(cards[i]).click
 				#Have to click another element before the next go-around
 				js_scroll_up(myaccount.map_cc_picture(1),true)
 				wait.until { myaccount.map_cc_picture(1).displayed? }
@@ -447,18 +530,34 @@ describe "My Account functionality" do
 			sleep 1
 			myaccount.map_cc_cvv.send_keys("asd")
 			myaccount.map_submit_cta.click
-			wait.until { myaccount.map_cc_cvv_error.displayed? }
+			expect(myaccount.map_cc_cvv.attribute("class").include? "is-error").to eql true
 			#Valid CVV
 			sleep 1
-			myaccount.map_cc_cvv_error.clear
-			myaccount.map_cc_cvv_error.send_keys("123")
+			myaccount.map_cc_cvv.clear
+			myaccount.map_cc_cvv.send_keys("123")
 			myaccount.map_submit_cta.click
-			wait.until { myaccount.map_cc_cvv.displayed? }
+			expect(myaccount.map_cc_cvv.attribute("class").include? "is-error").to eql false
 
 			#Invalid expiration date (defaults to invalid)
 			sleep 1
 			myaccount.map_submit_cta.click
 			wait.until { myaccount.map_cc_date_error.displayed? }
+			#Valid expiration date
+			sleep 1
+			myaccount.map_cc_month.click
+			wait.until { myaccount.map_cc_month_item("02").displayed? }
+			myaccount.map_cc_month_item("02").click
+			myaccount.map_cc_year.click
+			wait.until { myaccount.map_cc_year_item(2017).displayed? }
+			myaccount.map_cc_year_item(2017).click
+			myaccount.map_submit_cta.click
+			begin
+				wait.until { myaccount.map_cc_date_error.displayed? }
+				fail("Invalid year error still displayed after entering valid year")
+			rescue Selenium::WebDriver::Error::TimeOutError
+				#This is what we want
+			end
+
 		end
 
 		it " - Account Message DNI" do
@@ -485,5 +584,7 @@ describe "My Account functionality" do
 				end
 			end
 		end
+
+
 	end
 end

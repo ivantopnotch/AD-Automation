@@ -28,11 +28,11 @@ class HeaderPage
 
   #Dropdowns and their links
   def dropdown(number)
-    return $test_driver.find_element(:id, "site-nav-wrapper").find_element(:xpath, "//ul[@class='site-nav']/li[@class='nav-item-wrapper']["+number.to_s+"]")
+    return $test_driver.find_element(:xpath, "//nav[@id='site-nav-wrapper']/ul[@class='site-nav']/li[@class='nav-item-wrapper']["+number.to_s+"]")
   end
 
   def dropdown_link(drop_no, link_no)
-    return $test_driver.find_element(:id, "site-nav-wrapper").find_element(:xpath, "//ul[@class='site-nav']/li[@class='nav-item-wrapper']["+drop_no.to_s+"]/ul//li["+link_no.to_s+"]/a")
+    return $test_driver.find_element(:xpath, "//nav[@id='site-nav-wrapper']/ul[@class='site-nav']/li[@class='nav-item-wrapper']["+drop_no.to_s+"]/ul//li["+link_no.to_s+"]/a")
   end
 
 end
