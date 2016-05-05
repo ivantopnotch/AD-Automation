@@ -17,7 +17,7 @@ RSpec.configure do |config|
   config.include AllureRSpec::Adaptor
 
   $logger = Logger.new('aspendental_test.txt')
-  $ad_env = "alpha-www"
+  $ad_env = "uat-web"
   $domain = ".aspendental.com"
 
   utility = AspenDental.new()
@@ -123,13 +123,49 @@ def test_link_back(link, parent_title, expected_title, lowercase = false, timeou
     fail("Error loading page " + expected_title)
   end
   #Go back; some browsers have problems navigating back the first time
-  $test_driver.navigate.back
-  start_time = time_now_sec
-  while !$test_driver.title.include? parent_title do
-    if time_now_sec >= start_time + timeout
+  
+  begin
+    $test_driver.navigate.back
+    wait.until { $test_driver.title.include? parent_title }
+  rescue Selenium::WebDriver::Error::TimeOutError
+    begin
+      $test_driver.navigate.back
+      wait.until { $test_driver.title.include? parent_title }
+    rescue Selenium::WebDriver::Error::TimeOutError
       fail("Error navigating back from " + expected_title)
     end
-    #Try again
-    $test_driver.navigate.back
   end
+end
+
+def test_link_tab(link, expected_title = nil, expected_url = nil)
+  wait = Selenium::WebDriver::Wait.new(timeout: 3)
+  
+  #Open link
+  link.click
+  $test_driver.switch_to.window( $test_driver.window_handles.last )
+  #Test it for URL or title
+  begin
+    if expected_title == nil
+      wait.until { $test_driver.current_url.include? expected_url }
+    elsif expected_url == nil
+      wait.until { $test_driver.title.include? expected_title }
+    else
+      fail("Did not specify expected title or expected url")
+    end
+    #Print detalied error message
+  rescue Selenium::WebDriver::Error::TimeOutError
+    if expected_title == nil
+      fail("Expected URL did not include " + expected_url + ", was instead: " + $test_driver.current_url)
+    elsif expected_url == nil
+      fail("Expected title did not include " + expected_title + ", was instead: " + $test_driver.title)
+    end
+  end
+
+  #Close tab that was opened
+  if ENV['BROWSER_TYPE'] == 'IE'
+    $test_driver.execute_script("window.open('', '_self', ''); window.close();")
+  else
+    $test_driver.execute_script("window.close();")
+  end
+  $test_driver.switch_to.window( $test_driver.window_handles.first )
 end

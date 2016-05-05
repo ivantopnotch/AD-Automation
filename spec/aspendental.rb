@@ -11,7 +11,9 @@ class AspenDental
       when 'FIREFOX'
         #Load adblock profile
         profile = Selenium::WebDriver::Firefox::Profile.from_name "adblock"
+        #profile = Selenium::WebDriver::Firefox::Profile.new
         profile['network.http.connection-timeout'] = 5
+        profile['network.cookie.cookieBehavior'] = 0
         Selenium::WebDriver::Firefox.path = ENV['BROWSER_LOCATION']
         return Selenium::WebDriver.for :firefox, :profile => profile
       when 'CHROME'
