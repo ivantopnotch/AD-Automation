@@ -1,18 +1,29 @@
 require 'spec_helper'
 require 'net/http'
 
-# We test abandonment modal multiple times, so let's make this re-usable
-def test_abandon_modal(step_no, saa)
+# Test abandonment modal in all steps
+# Allows specifying mode where it just opens the modal
+def test_abandon_modal(step_no, saa, just_open = false)
 	wait = Selenium::WebDriver::Wait.new(timeout: 3)
 	$logger.info("Step " + step_no.to_s + " abandonment modal")
-	#Make sure abandonment modal appears/closes correctly
-	wait.until { saa.logo_link.displayed? }
-	saa.logo_link.click
-	wait.until { saa.abandonment_modal.displayed? }
-	wait.until { saa.close_abandon_modal.displayed? }
-	saa.close_abandon_modal.click
-	# Wait for modal to disappaer
-	wait_for_disappear(saa.abandonment_modal, 3)
+	#Make sure abandonment modal appears/closes correctly for each link
+	if !just_open
+		links = [saa.logo_link, saa.back_to_home_link, saa.privacy_policy_link, saa.terms_of_use_link, saa.site_map_link, saa.office_listings_link]
+		links.each do |link|
+			wait.until { link.displayed? }
+			link.click
+			wait.until { saa.abandonment_modal.displayed? }
+
+			wait.until { saa.close_abandon_modal.displayed? }
+			saa.close_abandon_modal.click
+			# Wait for modal to disappaer
+			wait_for_disappear(saa.abandonment_modal, 3)
+		end
+	else
+		wait.until { saa.logo_link.displayed? }
+		saa.logo_link.click
+		wait.until { saa.abandonment_modal.displayed? }
+	end
 end
 
 #Get through step 1 with no testing (e.g. to get to step 2)
@@ -457,6 +468,18 @@ describe "'Schedule An Appointment' page functionality" do
 			#Step 3
 			step_3()
 			test_abandon_modal(3, saa)
+
+			#Test modal links
+			test_abandon_modal(3, saa, true)
+			#Remind me later
+			test_link_back(saa.remind_me_later, title, parsed["misc"]["sign-up"])
+			test_abandon_modal(1, saa, true)
+			#Yes I'd like to leave
+			test_link_back(saa.yes_leave_link, title, parsed["top-pages"]["home"])
+			test_abandon_modal(1, saa, true)
+			saa.back_to_schedule_cta.click
+			# Wait for modal to disappaer
+			wait_for_disappear(saa.abandonment_modal, 3)
 		end
 
 		# it " - Sign up page" do

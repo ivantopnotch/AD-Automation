@@ -137,6 +137,7 @@ def test_link_back(link, parent_title, expected_title, lowercase = false, timeou
   end
 end
 
+#Test a link that opens a new tab/window
 def test_link_tab(link, expected_title = nil, expected_url = nil)
   wait = Selenium::WebDriver::Wait.new(timeout: 3)
   

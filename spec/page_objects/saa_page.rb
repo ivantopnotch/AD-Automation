@@ -10,16 +10,46 @@ class SaaPage
 		return $test_driver.find_element(:partial_link_text, 'Your mouth. Our mission.')
 	end
 
-	def abandonment_modal()
-		return $test_driver.find_element(:class, "modal-abandon")
+	def back_to_home_link()
+		return $test_driver.find_element(:link_text, "Back to Home Page")
 	end
 
+	#Footer links
+	def privacy_policy_link()
+		return $test_driver.find_element(:link_text, "Privacy Policy")
+	end
+
+	def terms_of_use_link()
+		return $test_driver.find_element(:link_text, "Terms of Use")
+	end
+
+	def site_map_link()
+		return $test_driver.find_element(:partial_link_text, "Site Map")
+	end
+
+	def office_listings_link()
+		return $test_driver.find_element(:link_text, "Dental Office Listings")
+	end
+
+	def abandonment_modal()
+		return $test_driver.find_element(:class, "modal-close")
+	end
+
+	#This is the circular X cta
 	def close_abandon_modal()
 		return $test_driver.find_element(:partial_link_text, "Back to scheduling my appointment")
 	end
 
 	def remind_me_later()
 		return $test_driver.find_element(:partial_link_text, "Remind me later")
+	end
+
+	def yes_leave_link()
+		return $test_driver.find_element(:partial_link_text, "Yes, I'd like to leave")
+	end
+
+	def back_to_schedule_cta()
+		return $test_driver.find_element(:partial_link_text, "Back to scheduling my appointment")
 	end
 
   	def yes_cta()
