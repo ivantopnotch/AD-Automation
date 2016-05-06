@@ -15,32 +15,156 @@ def test_abandon_modal(step_no, saa)
 	wait_for_disappear(saa.abandonment_modal, 3)
 end
 
+#Get through step 1 with no testing (e.g. to get to step 2)
+#Includes navigating to SAA page
+def step_1(continue = true)
+	wait = Selenium::WebDriver::Wait.new(timeout: 3)
+	saa = SaaPage.new()
+	header = HeaderPage.new()
+	parsed = JSON.parse(open("spec/page_titles.json").read)
+
+	header.saa_cta.click
+	if(ENV['BROWSER_TYPE'] == 'IE')
+		sleep 1
+	end
+	wait.until { $test_driver.title.include? parsed["top-pages"]["SAA"] }
+	if continue
+		wait.until { saa.yes_cta.displayed? }
+		saa.yes_cta.click
+	end
+end
+
+#Get through step 2
+#Includes clicking "next step" CTA, unless specified
+def step_2(continue = true)
+	wait = Selenium::WebDriver::Wait.new(timeout: 3)
+	saa = SaaPage.new()
+	#Click 'no' under "Has this patient had an exam with us in the past?"
+	wait.until { saa.past_exam_no.displayed? }
+	saa.past_exam_no.click
+
+	#Click "18 or older" under "How old is the patient?"
+	wait.until { saa.how_old_over_18.displayed? }
+	saa.how_old_over_18.click
+
+	# Click on "Select primary reason" and choose an item
+	wait.until { saa.primary_reason_dropdown.displayed? }
+	js_scroll_up(saa.primary_reason_dropdown)
+	saa.primary_reason_dropdown.click
+
+	wait.until { saa.primary_reason_item(2).displayed? }
+	js_scroll_up(saa.primary_reason_item,true)
+	saa.primary_reason_item(2).click
+
+	#Click on "Next Step" CTA
+	if continue
+		wait.until { saa.next_step.displayed? }
+		saa.next_step.click
+	end
+end
+
+#Get through step 3
+#DOES NOT submit the form
+def step_3()
+	wait = Selenium::WebDriver::Wait.new(timeout: 3)
+	saa = SaaPage.new()
+	wait_longer = Selenium::WebDriver::Wait.new(timeout: 30)
+
+	#First name
+	wait.until { saa.first_name.displayed? }
+	js_scroll_up(saa.first_name)
+	saa.first_name.send_keys(('a'..'z').to_a.shuffle[0,8].join + "'")
+	saa.last_name.click
+	expect(saa.first_name.attribute("class").include? "is-error").to eql false
+
+	#Last name
+	wait.until { saa.last_name.displayed? }
+	saa.last_name.send_keys(('a'..'z').to_a.shuffle[0,8].join + "-" + ('a'..'z').to_a.shuffle[0,8].join)
+	saa.first_name.click
+	expect(saa.last_name.attribute("class").include? "is-error").to eql false
+
+	#Email
+	wait.until { saa.email.displayed? }
+	saa.email.send_keys(('a'..'z').to_a.shuffle[0,8].join + "@topnotchltd.com")
+	saa.first_name.click
+	expect(saa.email.attribute("class").include? "is-error").to eql false
+
+	#Month
+	saa.dob_month.clear
+	saa.dob_month.send_keys(rand(1 .. 12))
+	saa.first_name.click
+	expect(saa.dob_month.attribute("class").include? "is-error").to eql false
+
+	#Day
+	saa.dob_day.clear
+	saa.dob_day.send_keys(rand(1 .. 31))
+	saa.first_name.click
+	expect(saa.dob_day.attribute("class").include? "is-error").to eql false
+
+	#Year
+	saa.dob_year.clear
+	saa.dob_year.send_keys("1975")
+	saa.first_name.click
+	expect(saa.dob_year.attribute("class").include? "is-error").to eql false
+
+	#Phone number
+	#Area code
+	wait.until { saa.pn_area_code.displayed? }
+	saa.pn_area_code.send_keys(666)
+	saa.email.click
+	expect(saa.pn_area_code.attribute("class").include? "is-error").to eql false
+
+	#Exchange code
+	wait.until { saa.pn_exchange_code.displayed? }
+	saa.pn_exchange_code.send_keys(666)
+	saa.email.click
+	expect(saa.pn_exchange_code.attribute("class").include? "is-error").to eql false
+
+	#Suffix code
+	wait.until { saa.pn_exchange_code.displayed? }
+	saa.pn_suffix_code.send_keys("666666")
+	saa.email.click
+	expect(saa.pn_suffix_code.attribute("class").include? "is-error").to eql false
+
+	#Click on 'yes' under "Does the patient have dental insurance?"
+	wait.until { saa.insurance_yes.displayed? }
+	saa.insurance_yes.click
+
+	#Wait for calander to propogate
+	wait_longer.until { saa.apt_time_header.displayed? }
+end
+
 describe "'Schedule An Appointment' page functionality" do
 	header = HeaderPage.new()
 	saa = SaaPage.new()
 	scroll_sleep_time = 3
 	wait = Selenium::WebDriver::Wait.new(timeout: 3)
 	wait_longer = Selenium::WebDriver::Wait.new(timeout: 15)
+	parsed = JSON.parse(open("spec/page_titles.json").read)
+	title = parsed["top-pages"]["SAA"]
 
 	describe " - User can schedule an appointment correctly" do
 		$logger.info("User can schedule an appointment correctly")
 
-		it " - SAA page" do
-			$logger.info("SAA CTA")
+		it " - Step 1" do
+			$logger.info("Step 1")
 			#Click SAA link
 			header.saa_cta.click
-			wait.until { $test_driver.title.include? "Schedule a Dentist Appointment" }
-			sleep scroll_sleep_time
+			wait.until { $test_driver.title.include? title }
 
-			test_abandon_modal(1, saa)
+			#Make sure we are at default office
+			wait.until { saa.location_name.displayed? }
+			expect(saa.location_name.attribute("innerHTML") == "Cicero, NY")
 
-			$logger.info("Step 1 yes CTA")
-			wait.until { saa.yes_cta.displayed? }
-			saa.yes_cta.click
+			#Check FAO link
+			test_link_back(saa.fao_link, title, parsed["top-pages"]["FAO"])
+		end
 
-			test_abandon_modal(2, saa)
+		it " - Step 2" do
+			$logger.info("Step 2")
 
-			$logger.info("Step 2 past exam")
+			step_1()
+
 			#Click 'yes' under "Has this patient had an exam with us in the past?"; check for disclaimer
 			wait.until { saa.past_exam_yes.displayed? }
 			saa.past_exam_yes.click
@@ -50,7 +174,6 @@ describe "'Schedule An Appointment' page functionality" do
 			wait.until { saa.past_exam_no.displayed? }
 			saa.past_exam_no.click
 
-			$logger.info("Step 2 how old")
 			#Click "Under 18" under "How old is the patient?"; check for disclaimer
 			wait.until { saa.how_old_under_18.displayed? }
 			saa.how_old_under_18.click
@@ -60,7 +183,6 @@ describe "'Schedule An Appointment' page functionality" do
 			wait.until { saa.how_old_over_18.displayed? }
 			saa.how_old_over_18.click
 
-			$logger.info("Step 2 primary reason")
 			# Make sure we can't go to next step without picking a reason
 			wait.until { saa.next_step.displayed? }
 			saa.next_step.click
@@ -74,8 +196,14 @@ describe "'Schedule An Appointment' page functionality" do
 			wait.until { item.displayed? }
 			js_scroll_up(saa.primary_reason_item)
 			item.click
+		end
 
-			$logger.info("'Step 2 Why do we ask' boxes")
+		it " - Step 2 'why do we ask' boxes" do 
+			$logger.info("Step 2 'why do we ask' boxes")
+
+			step_1()
+			step_2(false) 
+
 			#Click 'Why do we ask' links and make sure shadowboxes appear; do it in reverse order
 			wait.until { saa.iae_why_link.displayed? }
 			js_scroll_up(saa.iae_why_link,true)
@@ -91,17 +219,16 @@ describe "'Schedule An Appointment' page functionality" do
 			js_scroll_up(saa.np_why_link,true)
 			saa.np_why_link.click
 			wait.until { saa.np_why_box.displayed? }
+		end
 
-			$logger.info("Step 2 next step")
-			# Click on "Next Step" CTA; we already made sure it's visible
-			saa.next_step.click
+		it " - Step 3 calander" do 
+			$logger.info("Step 3 calander")
 
-			test_abandon_modal(3, saa)
-
-			#Make sure date/time are populated; throws an error if we submit form before they are
-			wait_longer.until { saa.apt_date_header.displayed? }
+			step_1()
+			step_2()
 
 			#Click all the active dates/times on the calendar
+			wait_longer.until { saa.apt_time_header.displayed? }
 			$logger.info("Step 3 calander dates/times")
 			for r in 1 .. 5
 				for c in 1 .. 7
@@ -127,12 +254,20 @@ describe "'Schedule An Appointment' page functionality" do
 						end
 					end
 				end
-			end
+			end #End of loops
 
-			$logger.info("Step 3 first name")
+		end
+
+		it " - Step 3 validation - First/last name" do
+			$logger.info("Step 3 validation - First/last name, email")
+
+			step_1()
+			step_2()
+
 			#Check invalid input
 			#Errors will include "is-error" in class name
-			saa.first_name.send_keys("1235")
+			wait.until { saa.first_name.displayed? }
+			saa.first_name.send_keys("1235!@#{}")
 			#Click another element to fire on-blur
 			saa.last_name.click
 			#Check for error
@@ -143,7 +278,6 @@ describe "'Schedule An Appointment' page functionality" do
 			saa.last_name.click
 			expect(saa.first_name.attribute("class").include? "is-error").to eql false
 
-			$logger.info("Step 3 last name")
 			#Check invalid input
 			saa.last_name.send_keys("12345")
 			saa.first_name.click
@@ -154,23 +288,34 @@ describe "'Schedule An Appointment' page functionality" do
 			saa.first_name.click
 			expect(saa.last_name.attribute("class").include? "is-error").to eql false
 
-			$logger.info("Step 3 email")
 			#Check invalid input
-			saa.email.send_keys("a@a")
-			saa.first_name.click
-			expect(saa.email.attribute("class").include? "is-error").to eql true
+			invalid_emails = ["a","a@a","a@a.a"]
+			for i in 0 .. invalid_emails.length-1
+				saa.email.clear
+				saa.email.send_keys(invalid_emails[i])
+				saa.first_name.click
+				expect(saa.email.attribute("class").include? "is-error").to eql true
+			end
 			#Check valid input
 			saa.email.clear
 			saa.email.send_keys(('a'..'z').to_a.shuffle[0,8].join + "@topnotchltd.com")
 			saa.first_name.click
 			expect(saa.email.attribute("class").include? "is-error").to eql false
+		end
 
-			$logger.info("Step 3 date of birth")
+		it " - Step 3 validation - Date of birth" do
+			$logger.info("Step 3 validation - Date of birth")
+
+			step_1()
+			step_2()
+
 			#Month
 			#Check invalid input
+			wait.until { saa.dob_month.displayed? }
+			js_scroll_up(saa.dob_month)
 			saa.dob_month.send_keys("13")
 			saa.first_name.click
-			#expect(saa.dob_month.attribute("class").include? "is-error").to eql true
+			expect(saa.dob_month.attribute("class").include? "is-error").to eql true
 			wait.until { saa.dob_error.displayed? }
 			#Check valid input
 			saa.dob_month.clear
@@ -182,7 +327,7 @@ describe "'Schedule An Appointment' page functionality" do
 			#Check invalid input
 			saa.dob_day.send_keys("32")
 			saa.first_name.click
-			#expect(saa.dob_day.attribute("class").include? "is-error").to eql true
+			expect(saa.dob_day.attribute("class").include? "is-error").to eql true
 			wait.until { saa.dob_error.displayed? }
 			#Check valid input
 			saa.dob_day.clear
@@ -196,7 +341,7 @@ describe "'Schedule An Appointment' page functionality" do
 			#Check invalid input
 			saa.dob_year.send_keys(start_year - 1)
 			saa.first_name.click
-			#expect(saa.dob_year.attribute("class").include? "is-error").to eql true
+			expect(saa.dob_year.attribute("class").include? "is-error").to eql true
 			wait.until { saa.dob_error.displayed? }
 			saa.dob_year.clear
 			saa.dob_year.send_keys(end_year + 2)
@@ -207,10 +352,17 @@ describe "'Schedule An Appointment' page functionality" do
 			saa.dob_year.send_keys(rand(start_year .. end_year))
 			saa.first_name.click
 			expect(saa.dob_year.attribute("class").include? "is-error").to eql false
+		end
 
-			$logger.info("Step 3 phone number")
+		it " - Step 3 validation - Phone number" do
+			$logger.info("Step 3 validation - Phone number")
+
+			step_1()
+			step_2()
+
 			#Area code
 			#Check invalid input
+			wait.until { saa.pn_area_code.displayed? }
 			saa.pn_area_code.send_keys("abc")
 			saa.email.click
 			expect(saa.pn_area_code.attribute("class").include? "is-error").to eql true
@@ -241,8 +393,14 @@ describe "'Schedule An Appointment' page functionality" do
 			saa.pn_suffix_code.send_keys(rand(2000 .. 9999))
 			saa.email.click
 			expect(saa.pn_suffix_code.attribute("class").include? "is-error").to eql false
+		end
 
-			$logger.info("Step 3 Insurance y/n")
+		it " - Step 3 validation - The rest" do
+			$logger.info("Step 3 validation - The rest")
+
+			step_1()
+			step_2()
+
 			#Make sure we can't continue without selecting one
 			wait.until { saa.schedule_cta.displayed? }
 			saa.schedule_cta.click
@@ -252,28 +410,53 @@ describe "'Schedule An Appointment' page functionality" do
 			#Click on 'no' under "Does the patient have dental insurance?"
 			saa.insurance_no.click
 
-			$logger.info("Step 3 policy info")
 			#Click "Learn about our policy here" link
 			saa.policy_link.click
 			#Make sure policy message appears
 			wait.until { saa.policy_message.displayed? }
 
 			#Select "mobile phone" in the phone type dropdown
-			$logger.info("Step 3 Phone Type")
 			js_scroll_up(saa.phone_type_dropdown)
 			saa.phone_type_dropdown.click
 			saa.phone_type_item.click
 			#Make sure disclaimer shows
 			wait.until { saa.mobile_phone_disclaimer.displayed? }
 
-			$logger.info("Step 3 'why do we ask' link")
 			saa.di_why_link.click
 			wait.until { saa.di_why_box.displayed? }
+		end
 
-			# $logger.info("Step 3 submit form button")
-			# #Submit form and check success
-			# saa.schedule_cta.click
-			# wait_longer.until { saa.thank_you.displayed? }
+		# it " - Form submission and success" do
+		# 	$logger.info("Form submission and success")
+
+		# 	step_1()
+		# 	step_2()
+		# 	step_3()
+
+		# 	#Submit form and check success
+		# 	saa.schedule_cta.click
+		# 	wait_longer.until { saa.thank_you.displayed? }
+		# end
+
+		it " - Abandonment modal" do 
+			$logger.info("Abandonment modal")
+
+			#Step 1
+			step_1(false)
+			sleep 1
+			test_abandon_modal(1, saa)
+			wait.until { saa.yes_cta.displayed? }
+			saa.yes_cta.click
+
+			#Step 2
+			step_2(false)
+			test_abandon_modal(2, saa)
+			wait.until { saa.next_step.displayed? }
+			saa.next_step.click
+
+			#Step 3
+			step_3()
+			test_abandon_modal(3, saa)
 		end
 
 		# it " - Sign up page" do
@@ -282,102 +465,9 @@ describe "'Schedule An Appointment' page functionality" do
 		# 	forsee = ForseePage.new().add_cookies()
 
 		# 	$logger.info("Sign up page")
-		# 	#Click SAA link
-		# 	header.saa_cta.click
-		# 	wait.until { $test_driver.title.include? "Schedule a Dentist Appointment" }
-
-		# 	#Do an adbridged version of the above to get past main SAA screen
-		# 	$logger.info("Schedule appointment")
-		# 	#Step 1
-		# 	#Click yes CTA
-		# 	wait.until { saa.yes_cta.displayed? }
-		# 	saa.yes_cta.click
-
-		# 	#Step 2
-		# 	#Click 'no' under "Has this patient had an exam with us in the past?"
-		# 	wait.until { saa.past_exam_no.displayed? }
-		# 	saa.past_exam_no.click
-
-		# 	#Click "18 or older" under "How old is the patient?"
-		# 	wait.until { saa.how_old_over_18.displayed? }
-		# 	saa.how_old_over_18.click
-
-		# 	# Click on "Select primary reason" and choose an item
-		# 	wait.until { saa.primary_reason_dropdown.displayed? }
-		# 	saa.primary_reason_dropdown.click
-
-		# 	wait.until { saa.primary_reason_item(2).displayed? }
-		# 	js_scroll_up(saa.primary_reason_item,true)
-		# 	saa.primary_reason_item(2).click
-
-		# 	#Click on "Next Step" CTA
-		# 	wait.until { saa.next_step.displayed? }
-		# 	saa.next_step.click
-
-		# 	#Step 3
-		
-		# 	#First name
-		# 	wait.until { saa.first_name.displayed? }
-		# 	js_scroll_up(saa.first_name)
-		# 	saa.first_name.send_keys(('a'..'z').to_a.shuffle[0,8].join + "'")
-		# 	saa.last_name.click
-		# 	expect(saa.first_name.attribute("class").include? "is-error").to eql false
-
-		# 	#Last name
-		# 	wait.until { saa.last_name.displayed? }
-		# 	saa.last_name.send_keys(('a'..'z').to_a.shuffle[0,8].join + "-" + ('a'..'z').to_a.shuffle[0,8].join)
-		# 	saa.first_name.click
-		# 	expect(saa.last_name.attribute("class").include? "is-error").to eql false
-
-		# 	#Email
-		# 	wait.until { saa.email.displayed? }
-		# 	saa.email.send_keys(('a'..'z').to_a.shuffle[0,8].join + "@topnotchltd.com")
-		# 	saa.first_name.click
-		# 	expect(saa.email.attribute("class").include? "is-error").to eql false
-
-		# 	#DOB
-		# 	wait.until { saa.dob_month.displayed? }
-		# 	saa.dob_month.send_keys(rand(1 .. 12))
-		# 	saa.first_name.click
-		# 	expect(saa.dob_month.attribute("class").include? "is-error").to eql false
-
-		# 	#Day
-		# 	wait.until { saa.dob_day.displayed? }
-		# 	saa.dob_day.send_keys(rand(1 .. 31))
-		# 	saa.first_name.click
-		# 	expect(saa.dob_day.attribute("class").include? "is-error").to eql false
-
-		# 	#Year
-		# 	wait.until { saa.dob_year.displayed? }
-		# 	saa.dob_year.send_keys("1975")
-		# 	saa.first_name.click
-		# 	expect(saa.dob_year.attribute("class").include? "is-error").to eql false
-
-		# 	#Phone number
-		# 	#Area code
-		# 	wait.until { saa.pn_area_code.displayed? }
-		# 	saa.pn_area_code.send_keys(rand(200 .. 999))
-		# 	saa.email.click
-		# 	expect(saa.pn_area_code.attribute("class").include? "is-error").to eql false
-
-		# 	#Exchange code
-		# 	wait.until { saa.pn_exchange_code.displayed? }
-		# 	saa.pn_exchange_code.send_keys(rand(200 .. 999))
-		# 	saa.email.click
-		# 	expect(saa.pn_exchange_code.attribute("class").include? "is-error").to eql false
-
-		# 	#Suffix code
-		# 	wait.until { saa.pn_exchange_code.displayed? }
-		# 	saa.pn_suffix_code.send_keys(rand(2000 .. 9999))
-		# 	saa.email.click
-		# 	expect(saa.pn_suffix_code.attribute("class").include? "is-error").to eql false
-
-		# 	#Click on 'yes' under "Does the patient have dental insurance?"
-		# 	wait.until { saa.insurance_yes.displayed? }
-		# 	saa.insurance_yes.click
-
-		# 	#Wait for calander to propogate
-		# 	wait_longer.until { saa.apt_time_header.displayed? }
+		# 	step_1()
+		# 	step_2()
+		# 	step_3()
 		# 	#Submit form and check success
 		# 	wait.until { saa.schedule_cta.displayed? }
 		# 	saa.schedule_cta.click

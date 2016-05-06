@@ -5,6 +5,7 @@ class SaaPage
 		@scroll_sleep_time = 3
 	end
 
+	#Abandonment stuff
 	def logo_link()
 		return $test_driver.find_element(:partial_link_text, 'Your mouth. Our mission.')
 	end
@@ -25,19 +26,28 @@ class SaaPage
   		return $test_driver.find_element(:partial_link_text, 'Yes')
 	end
 
+	#Step 1
+	def location_name()
+		return $test_driver.find_element(:class, "location-name")
+	end
+
+	def fao_link()
+		return $test_driver.find_element(:link_text, "No? Choose another one of our 500 locations.")
+	end
+
 	# np = new-patient
 	def np_why_link()
-		return $test_driver.find_element(:id, "new-patient-container").find_element(:xpath => "//div[@class='whydoweask']/a[@class='whylink']")
+		return $test_driver.find_elements(:class, "whylink")[0]
 	end
 
 	#isp = is-new-patient
 	def isp_why_link()
-		return $test_driver.find_element(:id, "new-patient-container").find_element(:xpath => "//div[@class='is-new-patient']/div[@class='whydoweask']/a[@class='whylink']")
+		return $test_driver.find_elements(:class, "whylink")[1]
 	end
 
 	#iae = is-above-eighteen
 	def iae_why_link()
-		return $test_driver.find_element(:id, "new-patient-container").find_element(:xpath => "//div[@class='is-above-eighteen']/div[@class='whydoweask']")
+		return $test_driver.find_elements(:class, "whylink")[2]
 	end
 
 	def np_why_box()
@@ -161,11 +171,11 @@ class SaaPage
 	end
 
 	def phone_type_dropdown()
-		return $test_driver.find_element(:id, "dk_container_phoneTypeSelect")
+		return $test_driver.find_element(:id, "dk1-phoneTypeSelect")
 	end
 
 	def phone_type_item()
-		return $test_driver.find_element(:partial_link_text, "Mobile Phone")
+		return $test_driver.find_element(:id, "dk1-2")
 	end
 
 	def mobile_phone_disclaimer()
