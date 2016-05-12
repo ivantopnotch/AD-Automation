@@ -17,6 +17,7 @@ class TestValidation
 		element.send_keys(input)
 		#Click another element to fire on-blur
 		if(on_blur_element != nil)
+			js_scroll_up(on_blur_element)
 			on_blur_element.click
 		end
 
@@ -35,6 +36,7 @@ class TestValidation
 		element.send_keys(input)
 		#Click another element to fire on-blur
 		if(on_blur_element != nil)
+			js_scroll_up(on_blur_element)
 			on_blur_element.click
 		end
 

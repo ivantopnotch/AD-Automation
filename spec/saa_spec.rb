@@ -437,24 +437,7 @@ describe "'Schedule An Appointment' page functionality" do
 		# 	links = [saa.print_offers_cta, saa.download_forms_cta, saa.add_calendar_link, saa.directions_link]
 		# 	titles = [parsed["top-pages"]["pricing-offers"], parsed["misc"]["patient-forms"], "Calendar", "Google Maps"]
 		# 	for i in 0 .. links.length-1
-		# 		wait.until { links[i].displayed? }
-		# 		links[i].click
-		# 		$test_driver.switch_to.window( $test_driver.window_handles.last )
-		# 		wait_longer.until { $test_driver.title.include? titles[i] }
-		# 		if ENV['BROWSER_TYPE'] == 'IE'
-		# 			$test_driver.execute_script("window.open('', '_self', ''); window.close();")
-		# 		else
-		# 			$test_driver.execute_script("window.close();")
-		# 		end
-		# 		$test_driver.switch_to.window( $test_driver.window_handles.first )
-		# 		#IE likes to not close the window, so double check
-		# 		if ENV['BROWSER_TYPE'] == 'IE'
-		# 			sleep 3
-		# 			if (test_driver.title.include? titles[i])
-		# 				$test_driver.execute_script("window.open('', '_self', ''); window.close();")
-		# 				$test_driver.switch_to.window( $test_driver.window_handles.first )
-		# 			end
-		# 		end
+		# 		test_link_tab(links[i], titles[i])
 		# 	end
 		# 	#Check 'add to outlook' link status (we don't want to download the file)
 		# 	url = saa.add_outlook_link.attribute("href").split(".com/")
@@ -471,44 +454,25 @@ describe "'Schedule An Appointment' page functionality" do
 		# 	#Invalid input
 		# 	invalid_cases = ["12345678","!@#!@#!@","btntes7"]
 		# 	for i in 0.. invalid_cases.length-1
-		# 		saa.username.clear
-		# 		saa.username.send_keys(invalid_cases[i])
-		# 		js_scroll_up(saa.password)
-		# 		saa.password.click
-		# 		expect(saa.username.attribute("class").include? "is-error").to eql true
+		# 		test_val.text_invalid_input(saa.username, invalid_cases[i], true, saa.password)
 		# 	end
 		# 	#Valid input
-		# 	saa.username.clear
-		# 	saa.username.send_keys(('a'..'z').to_a.shuffle[0,8].join)
-		# 	saa.password.click
-		# 	expect(saa.username.attribute("class").include? "is-error").to eql false
+		# 	test_val.text_valid_input(saa.username, ('a'..'z').to_a.shuffle[0,8].join, true, saa.password)
 
 		# 	$logger.info("Enter password")
 		# 	#Invalid input
 		# 	invalid_cases = ["asdfjkl8","asdfjkl#","Bnt$s7"]
 		# 	for i in 0.. invalid_cases.length-1
-		# 		saa.password.clear
-		# 		saa.password.send_keys(invalid_cases[i])
-		# 		saa.confirm_password.click
-		# 		expect(saa.password.attribute("class").include? "is-error").to eql true
+		# 		test_val.text_invalid_input(saa.password, invalid_cases[i], true, saa.confirm_password)
 		# 	end
 		# 	#Different passwords
-		# 	saa.password.clear
-		# 	saa.password.send_keys("Bnte$s7")
-		# 	saa.confirm_password.clear
-		# 	saa.confirm_password.send_keys("Bnte$s8")
-		# 	saa.password.click
-		# 	expect(saa.confirm_password.attribute("class").include? "is-error").to eql true
+		# 	test_val.text_valid_input(saa.password, "Bnte$s7")
+		# 	test_val.text_invalid_input(saa.confirm_password, "Bnte$s8", true, saa.password)
 		# 	#Valid input
 		# 	saa.password.clear
 		# 	password = "TN1" + ('a'..'z').to_a.shuffle[0,8].join + "!"
-		# 	saa.password.send_keys(password)
-		# 	wait.until { saa.confirm_password.displayed? }
-		# 	saa.confirm_password.clear
-		# 	saa.confirm_password.send_keys(password)
-		# 	saa.security_answer.click
-		# 	expect(saa.password.attribute("class").include? "is-error").to eql false
-		# 	expect(saa.confirm_password.attribute("class").include? "is-error").to eql false
+		# 	test_val.text_valid_input(saa.password, password)
+		# 	test_val.text_valid_input(saa.confirm_password, password, true, saa.security_answer)
 
 		# 	$logger.info("Security question")
 		# 	#Invalid input
@@ -518,8 +482,7 @@ describe "'Schedule An Appointment' page functionality" do
 		# 	expect(saa.security_answer.attribute("class").include? "is-error").to eql true
 		# 	#Make sure we can't enter more than 50 characters
 		# 	over_fifty = "WXka7ZXJB4vKZy4XQ7f8O19HLM6nGPz5SckBGD8Gok0nq5Wy1Q$asdf" #Dollar sign is 51st character
-		# 	saa.security_answer.clear
-		# 	saa.security_answer.send_keys(over_fifty)
+		# 	test_val.text_invalid_input(saa.security_answer, over_fifty)
 		# 	if(saa.security_answer.attribute("value") != over_fifty.split("$").first)
 		# 		fail("Security answer was not truncated to 50 characters")
 		# 	end
@@ -530,8 +493,7 @@ describe "'Schedule An Appointment' page functionality" do
 		# 	item = rand(1 .. 6)
 		# 	wait.until { saa.security_dropdown_item(item).displayed? }
 		# 	saa.security_dropdown_item(item).click
-		# 	saa.security_answer.send_keys(('a'..'z').to_a.shuffle[0,8].join)
-		# 	expect(saa.security_answer.attribute("class").include? "is-error").to eql false
+		# 	test_val.text_valid_input(saa.security_answer, ('a'..'z').to_a.shuffle[0,8].join, true)
 
 		# 	$logger.info("Checkbox")
 		# 	#Make sure CTA changed from being greyed out

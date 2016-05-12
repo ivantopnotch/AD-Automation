@@ -289,11 +289,11 @@ class SaaPage
 	end
 
 	def security_dropdown()
-		return $test_driver.find_element(:id, "dk_container_form-security-question")
+		return $test_driver.find_element(:id, "dk2-combobox")
 	end
 
 	def security_dropdown_item(i)
-		return $test_driver.find_element(:id, "create-account-form").find_element(:xpath => "//fieldset[@class='security-field-wrapper field-container']/div[@id='dk_container_form-security-question']/div[@class='dk_options']/ul[@class='dk_options_inner']/li["+i.to_s+"]/a")
+		return $test_driver.find_element(:id, "dk2-" + i.to_s)
 	end
 
 	def security_answer()
