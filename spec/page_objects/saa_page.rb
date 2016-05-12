@@ -57,6 +57,11 @@ class SaaPage
 	end
 
 	#Step 1
+
+	def show_location()
+		return $test_driver.find_element(:id, "show-location")
+	end
+
 	def location_name()
 		return $test_driver.find_element(:class, "location-name")
 	end
@@ -184,7 +189,7 @@ class SaaPage
 	end
 
 	def dob_error()
-		return $test_driver.find_element(:id, "dob-inputs").find_element(:xpath => "//span[@class='form-error active']")
+		return $test_driver.find_element(:xpath => "//div[@id='dob-inputs']/span[@class='form-error active']")
 	end
 
 	#pn = phone number

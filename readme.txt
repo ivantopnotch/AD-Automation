@@ -9,7 +9,7 @@ bundle update
 this should install all required gemfiles
 3. Make sure to specify environment in spec_helper.rb
 4. Make sure to set up email in email_report.rb
-5. If on Mac OSX, make sure to copy the files from dotenv_osx to dotenv
+5. If on Mac OSX, make sure to copy the files from dotenv_osx to dotenv (these files default to windows)
 6. Run .bat file for desired browser(s) or manually enter rake [firefox/ie/chrome]
 
 INTERNET EXPLORER:
@@ -18,6 +18,7 @@ Using the x64 version is not recommended as it enters keys really slowly
 
 FIREFOX:
 By default, the script is set to run with a profile named "adblock" (which has an adblocking addon installed) to get around foresee, since manually adding the foresee cookies doesn't seem to work in firefox for some reason.
+You will need to run firefox -p (windows) or /Applications/Firefox.app/Contents/MacOS/firefox-bin --ProfileManager (mac osx) to create a new profile
 
 CHROME:
 Chrome driver is included. Should run without issue

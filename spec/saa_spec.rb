@@ -1,5 +1,6 @@
 require 'spec_helper'
 require 'net/http'
+require 'test_validation'
 
 # Test abandonment modal in all steps
 # Allows specifying mode where it just opens the modal
@@ -71,6 +72,8 @@ def step_2(continue = true)
 	if continue
 		wait.until { saa.next_step.displayed? }
 		saa.next_step.click
+		#Allow accordion menu to open
+		sleep 1
 	end
 end
 
@@ -80,62 +83,35 @@ def step_3()
 	wait = Selenium::WebDriver::Wait.new(timeout: 3)
 	saa = SaaPage.new()
 	wait_longer = Selenium::WebDriver::Wait.new(timeout: 30)
+	test_val = TestValidation.new()
 
 	#First name
-	wait.until { saa.first_name.displayed? }
-	js_scroll_up(saa.first_name)
-	saa.first_name.send_keys(('a'..'z').to_a.shuffle[0,8].join + "'")
-	saa.last_name.click
-	expect(saa.first_name.attribute("class").include? "is-error").to eql false
+	test_val.text_valid_input(saa.first_name,('a'..'z').to_a.shuffle[0,8].join + "'",true,saa.last_name)
 
 	#Last name
-	wait.until { saa.last_name.displayed? }
-	saa.last_name.send_keys(('a'..'z').to_a.shuffle[0,8].join + "-" + ('a'..'z').to_a.shuffle[0,8].join)
-	saa.first_name.click
-	expect(saa.last_name.attribute("class").include? "is-error").to eql false
+	test_val.text_valid_input(saa.last_name, ('a'..'z').to_a.shuffle[0,8].join + "-" + ('a'..'z').to_a.shuffle[0,8].join, true, saa.first_name)
 
 	#Email
-	wait.until { saa.email.displayed? }
-	saa.email.send_keys(('a'..'z').to_a.shuffle[0,8].join + "@topnotchltd.com")
-	saa.first_name.click
-	expect(saa.email.attribute("class").include? "is-error").to eql false
+	test_val.text_valid_input(saa.email, ('a'..'z').to_a.shuffle[0,8].join + "@topnotchltd.com", true, saa.first_name)
 
 	#Month
-	saa.dob_month.clear
-	saa.dob_month.send_keys(rand(1 .. 12))
-	saa.first_name.click
-	expect(saa.dob_month.attribute("class").include? "is-error").to eql false
+	test_val.text_valid_input(saa.dob_month, rand(1 .. 12), true, saa.first_name)
 
 	#Day
-	saa.dob_day.clear
-	saa.dob_day.send_keys(rand(1 .. 31))
-	saa.first_name.click
-	expect(saa.dob_day.attribute("class").include? "is-error").to eql false
+	test_val.text_valid_input(saa.dob_day, rand(1 .. 31), true, saa.first_name)
 
 	#Year
-	saa.dob_year.clear
-	saa.dob_year.send_keys("1975")
-	saa.first_name.click
-	expect(saa.dob_year.attribute("class").include? "is-error").to eql false
+	test_val.text_valid_input(saa.dob_year, "1975", true, saa.first_name)
 
 	#Phone number
 	#Area code
-	wait.until { saa.pn_area_code.displayed? }
-	saa.pn_area_code.send_keys(666)
-	saa.email.click
-	expect(saa.pn_area_code.attribute("class").include? "is-error").to eql false
+	test_val.text_valid_input(saa.pn_area_code, 666, true, saa.email)
 
 	#Exchange code
-	wait.until { saa.pn_exchange_code.displayed? }
-	saa.pn_exchange_code.send_keys(666)
-	saa.email.click
-	expect(saa.pn_exchange_code.attribute("class").include? "is-error").to eql false
+	test_val.text_valid_input(saa.pn_exchange_code, 666, true, saa.email)
 
 	#Suffix code
-	wait.until { saa.pn_exchange_code.displayed? }
-	saa.pn_suffix_code.send_keys("666666")
-	saa.email.click
-	expect(saa.pn_suffix_code.attribute("class").include? "is-error").to eql false
+	test_val.text_valid_input(saa.pn_suffix_code, "666666", true, saa.email)
 
 	#Click on 'yes' under "Does the patient have dental insurance?"
 	wait.until { saa.insurance_yes.displayed? }
@@ -151,6 +127,7 @@ describe "'Schedule An Appointment' page functionality" do
 	scroll_sleep_time = 3
 	wait = Selenium::WebDriver::Wait.new(timeout: 3)
 	wait_longer = Selenium::WebDriver::Wait.new(timeout: 15)
+	test_val = TestValidation.new()
 	parsed = JSON.parse(open("spec/page_titles.json").read)
 	title = parsed["top-pages"]["SAA"]
 
@@ -167,8 +144,30 @@ describe "'Schedule An Appointment' page functionality" do
 			wait.until { saa.location_name.displayed? }
 			expect(saa.location_name.attribute("innerHTML") == "Cicero, NY")
 
+			#Make sure office was geolocated
+			expect(saa.show_location.attribute("innerHTML").include? "We've determined that this is the closest Aspen Dental office to your location.")
+
 			#Check FAO link
 			test_link_back(saa.fao_link, title, parsed["top-pages"]["FAO"])
+		end
+
+		it " - Step 1 non-geolocated office" do 
+			$logger.info("Step 1 non-geolocated office")
+
+			#Manually navigate to office page
+			$test_driver.navigate.to("https://" + $ad_env + $domain + "/dentist/prescott-valley-az-86314-2278")
+
+			#Click SAA link
+			header.saa_cta.click
+			wait.until { $test_driver.title.include? title }
+			sleep 1
+
+			#Make sure we are at the office we specified
+			wait.until { saa.location_name.displayed? }
+			expect(saa.location_name.attribute("innerHTML") == "Prescott Valley, AZ")
+
+			#Make sure office was NOT geolocated
+			expect(saa.show_location.attribute("innerHTML").include? "Do you want to schedule a new patient appointment at the following location:")
 		end
 
 		it " - Step 2" do
@@ -275,43 +274,18 @@ describe "'Schedule An Appointment' page functionality" do
 			step_1()
 			step_2()
 
-			#Check invalid input
-			#Errors will include "is-error" in class name
-			wait.until { saa.first_name.displayed? }
-			saa.first_name.send_keys("1235!@#{}")
-			#Click another element to fire on-blur
-			saa.last_name.click
-			#Check for error
-			expect(saa.first_name.attribute("class").include? "is-error").to eql true
-			#Check valid input
-			saa.first_name.clear
-			saa.first_name.send_keys(('a'..'z').to_a.shuffle[0,8].join + "'")
-			saa.last_name.click
-			expect(saa.first_name.attribute("class").include? "is-error").to eql false
+			test_val.text_invalid_input(saa.first_name, "1235!@#{}", true, saa.last_name)
+			test_val.text_valid_input(saa.first_name, ('a'..'z').to_a.shuffle[0,8].join + "'", true, saa.last_name)
 
-			#Check invalid input
-			saa.last_name.send_keys("12345")
-			saa.first_name.click
-			expect(saa.last_name.attribute("class").include? "is-error").to eql true
-			#Check valid input
-			saa.last_name.clear
-			saa.last_name.send_keys(('a'..'z').to_a.shuffle[0,8].join + "-" + ('a'..'z').to_a.shuffle[0,8].join)
-			saa.first_name.click
-			expect(saa.last_name.attribute("class").include? "is-error").to eql false
+			test_val.text_invalid_input(saa.last_name, "1235!@#{}", true, saa.first_name)
+			test_val.text_valid_input(saa.last_name, ('a'..'z').to_a.shuffle[0,8].join + "-" + ('a'..'z').to_a.shuffle[0,8].join, true, saa.first_name)
 
 			#Check invalid input
 			invalid_emails = ["a","a@a","a@a.a"]
 			for i in 0 .. invalid_emails.length-1
-				saa.email.clear
-				saa.email.send_keys(invalid_emails[i])
-				saa.first_name.click
-				expect(saa.email.attribute("class").include? "is-error").to eql true
+				test_val.text_invalid_input(saa.email, invalid_emails[i], true, saa.first_name)
 			end
-			#Check valid input
-			saa.email.clear
-			saa.email.send_keys(('a'..'z').to_a.shuffle[0,8].join + "@topnotchltd.com")
-			saa.first_name.click
-			expect(saa.email.attribute("class").include? "is-error").to eql false
+			test_val.text_valid_input(saa.email, ('a'..'z').to_a.shuffle[0,8].join + "@topnotchltd.com", true, saa.first_name)
 		end
 
 		it " - Step 3 validation - Date of birth" do
@@ -321,48 +295,29 @@ describe "'Schedule An Appointment' page functionality" do
 			step_2()
 
 			#Month
-			#Check invalid input
-			wait.until { saa.dob_month.displayed? }
-			js_scroll_up(saa.dob_month)
-			saa.dob_month.send_keys("13")
-			saa.first_name.click
-			expect(saa.dob_month.attribute("class").include? "is-error").to eql true
-			wait.until { saa.dob_error.displayed? }
-			#Check valid input
-			saa.dob_month.clear
-			saa.dob_month.send_keys(rand(1 .. 12))
-			saa.first_name.click
-			expect(saa.dob_month.attribute("class").include? "is-error").to eql false
+			test_val.text_invalid_input(saa.dob_month, "13", true, saa.first_name)
+			test_val.text_valid_input(saa.dob_month, rand(1 .. 12), true, saa.first_name)
 
 			#Day
-			#Check invalid input
-			saa.dob_day.send_keys("32")
-			saa.first_name.click
-			expect(saa.dob_day.attribute("class").include? "is-error").to eql true
-			wait.until { saa.dob_error.displayed? }
-			#Check valid input
-			saa.dob_day.clear
-			saa.dob_day.send_keys(rand(1 .. 31))
-			saa.first_name.click
-			expect(saa.dob_day.attribute("class").include? "is-error").to eql false
+			test_val.text_invalid_input(saa.dob_day, "32", true, saa.first_name)
+			test_val.error_msg(saa.dob_error,true)
+			test_val.text_valid_input(saa.dob_day, rand(1 .. 31), true, saa.first_name)
 
 			#Year
 			start_year = Date.today.year - 99
 			end_year = Date.today.year - 19
-			#Check invalid input
-			saa.dob_year.send_keys(start_year - 1)
-			saa.first_name.click
-			expect(saa.dob_year.attribute("class").include? "is-error").to eql true
-			wait.until { saa.dob_error.displayed? }
-			saa.dob_year.clear
-			saa.dob_year.send_keys(end_year + 2)
-			saa.first_name.click
-			wait.until { saa.dob_error.displayed? }
-			#Check valid input
-			saa.dob_year.clear
-			saa.dob_year.send_keys(rand(start_year .. end_year))
-			saa.first_name.click
-			expect(saa.dob_year.attribute("class").include? "is-error").to eql false
+
+			test_val.text_invalid_input(saa.dob_year, start_year - 1, true, saa.first_name)
+			test_val.error_msg(saa.dob_error,true)
+			test_val.text_invalid_input(saa.dob_year, end_year + 2, true, saa.first_name)
+			test_val.error_msg(saa.dob_error,true)
+			#Valid
+			test_val.text_valid_input(saa.dob_year, rand(start_year .. end_year), true, saa.first_name)
+			begin
+				test_val.error_msg(saa.dob_error,false)
+			rescue Selenium::WebDriver::Error::NoSuchElementError
+				#This is what we want
+			end
 		end
 
 		it " - Step 3 validation - Phone number" do
@@ -372,38 +327,16 @@ describe "'Schedule An Appointment' page functionality" do
 			step_2()
 
 			#Area code
-			#Check invalid input
-			wait.until { saa.pn_area_code.displayed? }
-			saa.pn_area_code.send_keys("abc")
-			saa.email.click
-			expect(saa.pn_area_code.attribute("class").include? "is-error").to eql true
-			#Check valid input
-			saa.pn_area_code.clear
-			saa.pn_area_code.send_keys(rand(200 .. 999))
-			saa.email.click
-			expect(saa.pn_area_code.attribute("class").include? "is-error").to eql false
+			test_val.text_invalid_input(saa.pn_area_code, "abc", true, saa.email)
+			test_val.text_valid_input(saa.pn_area_code, rand(200 .. 999), true, saa.email)
 
 			#Exchange code
-			#Check invalid input
-			saa.pn_exchange_code.send_keys("abc")
-			saa.email.click
-			expect(saa.pn_exchange_code.attribute("class").include? "is-error").to eql true
-			#Check valid input
-			saa.pn_exchange_code.clear
-			saa.pn_exchange_code.send_keys(rand(200 .. 999))
-			saa.email.click
-			expect(saa.pn_exchange_code.attribute("class").include? "is-error").to eql false
+			test_val.text_invalid_input(saa.pn_exchange_code, "abc", true, saa.email)
+			test_val.text_valid_input(saa.pn_exchange_code, rand(200 .. 999), true, saa.email)
 
 			#Suffix code
-			#Check invalid input
-			saa.pn_suffix_code.send_keys("abcd")
-			saa.email.click
-			expect(saa.pn_suffix_code.attribute("class").include? "is-error").to eql true
-			#Check valid input
-			saa.pn_suffix_code.clear
-			saa.pn_suffix_code.send_keys(rand(2000 .. 9999))
-			saa.email.click
-			expect(saa.pn_suffix_code.attribute("class").include? "is-error").to eql false
+			test_val.text_invalid_input(saa.pn_suffix_code, "abcd", true, saa.email)
+			test_val.text_valid_input(saa.pn_suffix_code, rand(2000 .. 9999), true, saa.email)
 		end
 
 		it " - Step 3 validation - The rest" do
@@ -466,10 +399,11 @@ describe "'Schedule An Appointment' page functionality" do
 			saa.next_step.click
 
 			#Step 3
+			sleep 1
 			step_3()
 			test_abandon_modal(3, saa)
 
-			#Test modal links
+			#Test links on modal
 			test_abandon_modal(3, saa, true)
 			#Remind me later
 			test_link_back(saa.remind_me_later, title, parsed["misc"]["sign-up"])

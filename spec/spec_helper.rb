@@ -123,17 +123,14 @@ def test_link_back(link, parent_title, expected_title, lowercase = false, timeou
     fail("Error loading page " + expected_title)
   end
   #Go back; some browsers have problems navigating back the first time
-  
+  num_retry = 0
   begin
     $test_driver.navigate.back
     wait.until { $test_driver.title.include? parent_title }
   rescue Selenium::WebDriver::Error::TimeOutError
-    begin
-      $test_driver.navigate.back
-      wait.until { $test_driver.title.include? parent_title }
-    rescue Selenium::WebDriver::Error::TimeOutError
-      fail("Error navigating back from " + expected_title)
-    end
+    num_retry += 1
+    retry if num_retry == 1
+    fail("Error navigating back from " + expected_title)
   end
 end
 
