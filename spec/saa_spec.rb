@@ -86,32 +86,32 @@ def step_3()
 	test_val = TestValidation.new()
 
 	#First name
-	test_val.text_valid_input(saa.first_name,('a'..'z').to_a.shuffle[0,8].join + "'",true,saa.last_name)
+	test_val.text_input(saa.first_name,('a'..'z').to_a.shuffle[0,8].join + "'",false,saa.last_name)
 
 	#Last name
-	test_val.text_valid_input(saa.last_name, ('a'..'z').to_a.shuffle[0,8].join + "-" + ('a'..'z').to_a.shuffle[0,8].join, true, saa.first_name)
+	test_val.text_input(saa.last_name, ('a'..'z').to_a.shuffle[0,8].join + "-" + ('a'..'z').to_a.shuffle[0,8].join, false, saa.first_name)
 
 	#Email
-	test_val.text_valid_input(saa.email, ('a'..'z').to_a.shuffle[0,8].join + "@topnotchltd.com", true, saa.first_name)
+	test_val.text_input(saa.email, ('a'..'z').to_a.shuffle[0,8].join + "@topnotchltd.com", false, saa.first_name)
 
 	#Month
-	test_val.text_valid_input(saa.dob_month, rand(1 .. 12), true, saa.first_name)
+	test_val.text_input(saa.dob_month, rand(1 .. 12), false, saa.first_name)
 
 	#Day
-	test_val.text_valid_input(saa.dob_day, rand(1 .. 31), true, saa.first_name)
+	test_val.text_input(saa.dob_day, rand(1 .. 31), false, saa.first_name)
 
 	#Year
-	test_val.text_valid_input(saa.dob_year, "1975", true, saa.first_name)
+	test_val.text_input(saa.dob_year, "1975", false, saa.first_name)
 
 	#Phone number
 	#Area code
-	test_val.text_valid_input(saa.pn_area_code, 666, true, saa.email)
+	test_val.text_input(saa.pn_area_code, 666, false, saa.email)
 
 	#Exchange code
-	test_val.text_valid_input(saa.pn_exchange_code, 666, true, saa.email)
+	test_val.text_input(saa.pn_exchange_code, 666, false, saa.email)
 
 	#Suffix code
-	test_val.text_valid_input(saa.pn_suffix_code, "666666", true, saa.email)
+	test_val.text_input(saa.pn_suffix_code, "666666", false, saa.email)
 
 	#Click on 'yes' under "Does the patient have dental insurance?"
 	wait.until { saa.insurance_yes.displayed? }
@@ -274,18 +274,18 @@ describe "'Schedule An Appointment' page functionality" do
 			step_1()
 			step_2()
 
-			test_val.text_invalid_input(saa.first_name, "1235!@#{}", true, saa.last_name)
-			test_val.text_valid_input(saa.first_name, ('a'..'z').to_a.shuffle[0,8].join + "'", true, saa.last_name)
+			test_val.text_input(saa.first_name, "1235!@#{}", true, saa.last_name)
+			test_val.text_input(saa.first_name, ('a'..'z').to_a.shuffle[0,8].join + "'", false, saa.last_name)
 
-			test_val.text_invalid_input(saa.last_name, "1235!@#{}", true, saa.first_name)
-			test_val.text_valid_input(saa.last_name, ('a'..'z').to_a.shuffle[0,8].join + "-" + ('a'..'z').to_a.shuffle[0,8].join, true, saa.first_name)
+			test_val.text_input(saa.last_name, "1235!@#{}", true, saa.first_name)
+			test_val.text_input(saa.last_name, ('a'..'z').to_a.shuffle[0,8].join + "-" + ('a'..'z').to_a.shuffle[0,8].join, false, saa.first_name)
 
 			#Check invalid input
 			invalid_emails = ["a","a@a","a@a.a"]
 			for i in 0 .. invalid_emails.length-1
-				test_val.text_invalid_input(saa.email, invalid_emails[i], true, saa.first_name)
+				test_val.text_input(saa.email, invalid_emails[i], true, saa.first_name)
 			end
-			test_val.text_valid_input(saa.email, ('a'..'z').to_a.shuffle[0,8].join + "@topnotchltd.com", true, saa.first_name)
+			test_val.text_input(saa.email, ('a'..'z').to_a.shuffle[0,8].join + "@topnotchltd.com", false, saa.first_name)
 		end
 
 		it " - Step 3 validation - Date of birth" do
@@ -295,24 +295,24 @@ describe "'Schedule An Appointment' page functionality" do
 			step_2()
 
 			#Month
-			test_val.text_invalid_input(saa.dob_month, "13", true, saa.first_name)
-			test_val.text_valid_input(saa.dob_month, rand(1 .. 12), true, saa.first_name)
+			test_val.text_input(saa.dob_month, "13", true, saa.first_name)
+			test_val.text_input(saa.dob_month, rand(1 .. 12), false, saa.first_name)
 
 			#Day
-			test_val.text_invalid_input(saa.dob_day, "32", true, saa.first_name)
+			test_val.text_input(saa.dob_day, "32", true, saa.first_name)
 			test_val.error_msg(saa.dob_error,true)
-			test_val.text_valid_input(saa.dob_day, rand(1 .. 31), true, saa.first_name)
+			test_val.text_input(saa.dob_day, rand(1 .. 31), false, saa.first_name)
 
 			#Year
 			start_year = Date.today.year - 99
 			end_year = Date.today.year - 19
 
-			test_val.text_invalid_input(saa.dob_year, start_year - 1, true, saa.first_name)
+			test_val.text_input(saa.dob_year, start_year - 1, true, saa.first_name)
 			test_val.error_msg(saa.dob_error,true)
-			test_val.text_invalid_input(saa.dob_year, end_year + 2, true, saa.first_name)
+			test_val.text_input(saa.dob_year, end_year + 2, true, saa.first_name)
 			test_val.error_msg(saa.dob_error,true)
 			#Valid
-			test_val.text_valid_input(saa.dob_year, rand(start_year .. end_year), true, saa.first_name)
+			test_val.text_input(saa.dob_year, rand(start_year .. end_year), false, saa.first_name)
 			begin
 				test_val.error_msg(saa.dob_error,false)
 			rescue Selenium::WebDriver::Error::NoSuchElementError
@@ -327,16 +327,16 @@ describe "'Schedule An Appointment' page functionality" do
 			step_2()
 
 			#Area code
-			test_val.text_invalid_input(saa.pn_area_code, "abc", true, saa.email)
-			test_val.text_valid_input(saa.pn_area_code, rand(200 .. 999), true, saa.email)
+			test_val.text_input(saa.pn_area_code, "abc", true, saa.email)
+			test_val.text_input(saa.pn_area_code, rand(200 .. 999), false, saa.email)
 
 			#Exchange code
-			test_val.text_invalid_input(saa.pn_exchange_code, "abc", true, saa.email)
-			test_val.text_valid_input(saa.pn_exchange_code, rand(200 .. 999), true, saa.email)
+			test_val.text_input(saa.pn_exchange_code, "abc", true, saa.email)
+			test_val.text_input(saa.pn_exchange_code, rand(200 .. 999), false, saa.email)
 
 			#Suffix code
-			test_val.text_invalid_input(saa.pn_suffix_code, "abcd", true, saa.email)
-			test_val.text_valid_input(saa.pn_suffix_code, rand(2000 .. 9999), true, saa.email)
+			test_val.text_input(saa.pn_suffix_code, "abcd", true, saa.email)
+			test_val.text_input(saa.pn_suffix_code, rand(2000 .. 9999), false, saa.email)
 		end
 
 		it " - Step 3 validation - The rest" do
@@ -454,25 +454,25 @@ describe "'Schedule An Appointment' page functionality" do
 		# 	#Invalid input
 		# 	invalid_cases = ["12345678","!@#!@#!@","btntes7"]
 		# 	for i in 0.. invalid_cases.length-1
-		# 		test_val.text_invalid_input(saa.username, invalid_cases[i], true, saa.password)
+		# 		test_val.text_input(saa.username, invalid_cases[i], true, saa.password)
 		# 	end
 		# 	#Valid input
-		# 	test_val.text_valid_input(saa.username, ('a'..'z').to_a.shuffle[0,8].join, true, saa.password)
+		# 	test_val.text_input(saa.username, ('a'..'z').to_a.shuffle[0,8].join, false, saa.password)
 
 		# 	$logger.info("Enter password")
 		# 	#Invalid input
 		# 	invalid_cases = ["asdfjkl8","asdfjkl#","Bnt$s7"]
 		# 	for i in 0.. invalid_cases.length-1
-		# 		test_val.text_invalid_input(saa.password, invalid_cases[i], true, saa.confirm_password)
+		# 		test_val.text_input(saa.password, invalid_cases[i], true, saa.confirm_password)
 		# 	end
 		# 	#Different passwords
-		# 	test_val.text_valid_input(saa.password, "Bnte$s7")
-		# 	test_val.text_invalid_input(saa.confirm_password, "Bnte$s8", true, saa.password)
+		# 	test_val.text_input(saa.password, "Bnte$s7")
+		# 	test_val.text_input(saa.confirm_password, "Bnte$s8", true, saa.password)
 		# 	#Valid input
 		# 	saa.password.clear
 		# 	password = "TN1" + ('a'..'z').to_a.shuffle[0,8].join + "!"
-		# 	test_val.text_valid_input(saa.password, password)
-		# 	test_val.text_valid_input(saa.confirm_password, password, true, saa.security_answer)
+		# 	test_val.text_input(saa.password, password)
+		# 	test_val.text_input(saa.confirm_password, password, false, saa.security_answer)
 
 		# 	$logger.info("Security question")
 		# 	#Invalid input
@@ -482,7 +482,7 @@ describe "'Schedule An Appointment' page functionality" do
 		# 	expect(saa.security_answer.attribute("class").include? "is-error").to eql true
 		# 	#Make sure we can't enter more than 50 characters
 		# 	over_fifty = "WXka7ZXJB4vKZy4XQ7f8O19HLM6nGPz5SckBGD8Gok0nq5Wy1Q$asdf" #Dollar sign is 51st character
-		# 	test_val.text_invalid_input(saa.security_answer, over_fifty)
+		# 	test_val.text_input(saa.security_answer, over_fifty)
 		# 	if(saa.security_answer.attribute("value") != over_fifty.split("$").first)
 		# 		fail("Security answer was not truncated to 50 characters")
 		# 	end
@@ -493,7 +493,7 @@ describe "'Schedule An Appointment' page functionality" do
 		# 	item = rand(1 .. 6)
 		# 	wait.until { saa.security_dropdown_item(item).displayed? }
 		# 	saa.security_dropdown_item(item).click
-		# 	test_val.text_valid_input(saa.security_answer, ('a'..'z').to_a.shuffle[0,8].join, true)
+		# 	test_val.text_input(saa.security_answer, ('a'..'z').to_a.shuffle[0,8].join, true)
 
 		# 	$logger.info("Checkbox")
 		# 	#Make sure CTA changed from being greyed out

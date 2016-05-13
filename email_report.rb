@@ -16,7 +16,7 @@ end
 options = { :address              => "smtp.gmail.com",
             :port                 => 587,
             :user_name            => 'topnotchtester@gmail.com',
-            :password             => '',
+            :password             => 'TopNotch123!',
             :authentication       => 'plain',
             :enable_starttls_auto => true  }
 
@@ -26,8 +26,8 @@ end
 
 Mail.deliver do
     from    'topnotchtester@gmail.com'
-    to      ''
-    cc      ''      
+    to      ['danny@topnotchltd.com', 'jake@topnotchltd.com']
+    cc      'billy@topnotchltd.com'
     subject "#{ARGV[0]} test results #{Time.now.strftime("%m/%d/%Y %H:%M")}"
     #body    report
     body    "1. Download attached zip file\n2. Extract allure-results to allure-commandline\\bin\n3. Double click generate.bat' (Windows)\n4. Double click 'open.bat' (Windows)\nMore detailed results follow:\n\n\n" + report

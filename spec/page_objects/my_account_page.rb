@@ -326,8 +326,16 @@ class MyAccountPage
 		return $test_driver.find_elements(:class, "appointment-detail-title")
 	end
 
+	def reschedule_day_header() #Used to check if dates are populated
+		return $test_driver.find_element(:class, "ui-datepicker-month")
+	end
+
 	def reschedule_days(row, column)
-		return $test_driver.find_element(:xpath => "//table[@class='ui-datepicker-calendar']/tbody/tr["+row.to_s+"]/td["+column.to_s+"]")
+		return $test_driver.find_element(:xpath => "//table[@class='ui-datepicker-calendar']/tbody/tr["+row.to_s+"]/td["+column.to_s+"]/a")
+	end
+
+	def reschedule_time_header() #Also used to check population
+		return $test_driver.find_element(:class, "appointment-date-time")
 	end
 
 	def reschedule_times(row, column)

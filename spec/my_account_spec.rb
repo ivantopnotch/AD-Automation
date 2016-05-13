@@ -1,25 +1,28 @@
 require 'spec_helper'
+require 'test_validation'
+require 'net/http'
 
 def login(username, password)
 	myaccount = MyAccountPage.new()
 	header = HeaderPage.new()
 	wait = Selenium::WebDriver::Wait.new(timeout: 3)
 	wait_long = Selenium::WebDriver::Wait.new(timeout: 7)
+	test_val = TestValidation.new()
 
 	header.my_account_cta.click
 	wait.until { $test_driver.current_url.include? "/my-account/login" }
 	
+	num_retry = 0
 	begin
-		myaccount.username_field.send_keys(username)
-		myaccount.password_field.send_keys(password)
+		test_val.text_input(myaccount.username_field, username, false)
+		test_val.text_input(myaccount.password_field, password, false)
 		myaccount.login_form.submit
 		wait_long.until { myaccount.make_a_payment_link.displayed? }
 	rescue Selenium::WebDriver::Error::TimeOutError
 		#Try again (thanks chrome)
-		myaccount.username_field.send_keys(username)
-		myaccount.password_field.send_keys(password)
-		myaccount.login_form.submit
-		wait_long.until { myaccount.make_a_payment_link.displayed? }
+		sleep 1
+		retry if (num_retry += 1) == 1
+		fail("Failed to login as user: " + username + " Pass: " + password)
 	end
 end
 
@@ -27,14 +30,15 @@ def open_map_modal()
 	#Open make a payment modal
 	myaccount = MyAccountPage.new()
 	wait = Selenium::WebDriver::Wait.new(timeout: 3)
+	num_retry = 0
 	begin
 		js_scroll_up(myaccount.make_a_payment_link)
 		myaccount.make_a_payment_link.click
 		wait.until { myaccount.map_modal.displayed? }
 	rescue Selenium::WebDriver::Error::TimeOutError
-		js_scroll_up(myaccount.make_a_payment_link)
-		myaccount.make_a_payment_link.click
-		wait.until { myaccount.map_modal.displayed? }
+		num_retry += 1
+		retry if num_retry == 1
+		fail("Make a Payment modal failed to open")
 	end
 end
 
@@ -45,6 +49,8 @@ describe "My Account functionality" do
 	scroll_sleep_time = 3
 	wait = Selenium::WebDriver::Wait.new(timeout: 3)
 	wait_long = Selenium::WebDriver::Wait.new(timeout: 20)
+	test_val = TestValidation.new()
+
 	account_password = "Aspen123!"
 
 	describe " - User can use My Account section correctly" do
@@ -56,38 +62,29 @@ describe "My Account functionality" do
 			#Navigate to page
 			header.my_account_cta.click
 			wait.until { $test_driver.current_url.include? "/my-account/login" }
-			#myaccount.username_field.send_keys(('a'..'z').to_a.shuffle[0,8].join)
 
 			#Valid username, invalid password
-			myaccount.username_field.send_keys("guarantorNDNA")
-			myaccount.password_field.send_keys("adsfjkl")
-			#myaccount.sign_in_cta.click
+			test_val.text_input(myaccount.username_field, "guarantorNDNA")
+			test_val.text_input(myaccount.password_field, "asdfjkl")
 			myaccount.login_form.submit
-			wait_long.until { myaccount.form_error_msg.displayed? }
+			#test_val.error_msg(myaccount.form_error_msg, true, nil, true)
+			wait_long.until {myaccount.form_error_msg.displayed? }
 
 			#Invalid username, valid password
-			myaccount.username_field.clear
-			myaccount.password_field.clear
-			myaccount.username_field.send_keys("a")
-			myaccount.password_field.send_keys("Valid987$")
-			#myaccount.sign_in_cta.click
+			test_val.text_input(myaccount.username_field, "a")
+			test_val.text_input(myaccount.password_field, "Valid987$")
 			myaccount.login_form.submit
-			wait.until { myaccount.form_uname_msg.displayed? }
+			test_val.error_msg(myaccount.form_uname_msg, true)
 
 			#Invalid username, invalid password
-			myaccount.username_field.clear
-			myaccount.password_field.clear
-			myaccount.username_field.send_keys("a")
-			myaccount.password_field.send_keys("a")
-			#myaccount.sign_in_cta.click
+			test_val.text_input(myaccount.username_field, "a")
+			test_val.text_input(myaccount.password_field, "Valid987$")
 			myaccount.login_form.submit
-			wait.until { myaccount.form_uname_msg.displayed? }
+			test_val.error_msg(myaccount.form_uname_msg, true)
 
 			#Valid username, valid password
-			myaccount.username_field.clear
-			myaccount.password_field.clear
-			myaccount.username_field.send_keys("guarantorNDNA")
-			myaccount.password_field.send_keys(account_password)
+			test_val.text_input(myaccount.username_field, "guarantorNDNA")
+			test_val.text_input(myaccount.password_field, account_password)
 			#myaccount.sign_in_cta.click
 			myaccount.login_form.submit
 			Selenium::WebDriver::Wait.new(timeout: 15, message: "My Account page failed to load in time after signing in").until { myaccount.sign_out_link.displayed? }
@@ -101,26 +98,25 @@ describe "My Account functionality" do
 			wait.until { $test_driver.current_url.include? "/my-account/login" }
 
 			#Open modal
+			num_retry = 0
 			begin
 				myaccount.forgot_username_link.click
 				wait.until { myaccount.fu_container.displayed? }
 			rescue Selenium::WebDriver::Error::TimeOutError
 				#Try again
-				myaccount.forgot_username_link.click
-				wait.until { myaccount.fu_container.displayed? }
+				num_retry += 1
+				retry if num_retry == 1
+				fail("Forgot username modal failed to open")
 			end
 
 			#Test required fields
 			myaccount.fu_submit_cta.click
-			wait.until { myaccount.fu_fname_field.attribute("class") == "text-field is-error"}
-			wait.until { myaccount.fu_lname_field.attribute("class") == "text-field is-error"}
-			wait.until { myaccount.fu_account_no_field.attribute("class") == "text-field is-error"}
+			test_val.batch_check_highlights([myaccount.fu_fname_field, myaccount.fu_lname_field, myaccount.fu_account_no_field], true)
 
 			#Invalid account
-			myaccount.fu_fname_field.send_keys("FName")
-			myaccount.fu_lname_field.send_keys("LName")
-			myaccount.fu_account_no_field.send_keys("12345")
-			myaccount.fu_submit_cta.click
+			test_val.text_input(myaccount.fu_fname_field, "FName")
+			test_val.text_input(myaccount.fu_lname_field, "LName")
+			test_val.text_input(myaccount.fu_account_no_field, "12345",false,myaccount.fu_submit_cta)
 			wait.until { myaccount.fu_message.displayed? }
 			error_msg = myaccount.fu_message.attribute("innerHTML")
 
@@ -131,13 +127,12 @@ describe "My Account functionality" do
 			wait.until { myaccount.fu_container.displayed? }
 			
 			#Valid account
-			myaccount.fu_fname_field.send_keys("richard")
-			myaccount.fu_lname_field.send_keys("test")
-			myaccount.fu_account_no_field.send_keys("1021")
-			myaccount.fu_submit_cta.click
+			test_val.text_input(myaccount.fu_fname_field, "richard")
+			test_val.text_input(myaccount.fu_lname_field, "test")
+			test_val.text_input(myaccount.fu_account_no_field, "1021",false,myaccount.fu_submit_cta)
 			wait.until { myaccount.fu_message.displayed? }
 			#Make sure we didn't recieve error message again
-			expect(myaccount.fu_message.attribute("innerHTML") != error_msg)
+			expect(myaccount.fu_message.attribute("innerHTML") != error_msg).to eql true
 		end
 
 		it " - Forgot password flow" do
@@ -148,33 +143,30 @@ describe "My Account functionality" do
 			wait.until { $test_driver.current_url.include? "/my-account/login" }
 
 			#Open modal
+			num_retry = 0
 			begin
 				myaccount.forgot_password_link.click
 				wait.until { myaccount.fp_container.displayed? }
 			rescue Selenium::WebDriver::Error::TimeOutError
 				#Try again
-				myaccount.forgot_password_link.click
-				wait.until { myaccount.fp_container.displayed? }
+				num_retry += 1
+				retry if num_retry == 1
+				fail("Forgot password modal failed to open")
 			end
 
 			#Check required field
 			myaccount.fp_submit_cta.click
-			wait.until { myaccount.fp_text_field.attribute("class") == "text-field name is-error" }
+			wait.until { myaccount.fp_text_field.attribute("class").include? "is-error" }
 
 			#Invalid username
-			myaccount.fp_text_field.send_keys("asdf")
-			myaccount.fp_submit_cta.click
-			wait.until { myaccount.fp_text_field.attribute("class") == "text-field name is-error" }
+			test_val.text_input(myaccount.fp_text_field, "asdf",true,myaccount.fp_submit_cta)
 
 			#Valid username
-			myaccount.fp_text_field.clear
-			myaccount.fp_text_field.send_keys("guarantorNDNA")
-			myaccount.fp_submit_cta.click
+			test_val.text_input(myaccount.fp_text_field, "guarantorNDNA",false,myaccount.fp_submit_cta)
 			wait.until { myaccount.fp_text_field.attribute("data-validate") == "security-question-answer" }
 
 			#Invalid security answer
-			myaccount.fp_text_field.send_keys("asdf")
-			myaccount.fp_submit_cta.click
+			test_val.text_input(myaccount.fp_text_field, "asdf",false,myaccount.fp_submit_cta)
 			wait.until { myaccount.fp_message.displayed? }
 
 			#Close/reopen modal
@@ -182,31 +174,23 @@ describe "My Account functionality" do
 			wait_for_disappear(myaccount.fp_message,3)
 			myaccount.forgot_password_link.click
 			wait.until { myaccount.fp_container.displayed? }
-			myaccount.fp_text_field.send_keys("guarantorNDNA")
-			myaccount.fp_submit_cta.click
+			test_val.text_input(myaccount.fp_text_field, "guarantorNDNA",false,myaccount.fp_submit_cta)
 			wait.until { myaccount.fp_text_field.attribute("data-validate") == "security-question-answer" }
 
 			#Valid security answer
-			myaccount.fp_text_field.clear
-			myaccount.fp_text_field.send_keys("emerald")
-			myaccount.fp_submit_cta.click
+			test_val.text_input(myaccount.fp_text_field, "emerald",false,myaccount.fp_submit_cta)
 			wait.until { myaccount.fp_password_field.displayed? }
 
 			#Two password requirement
-			myaccount.fp_password_field.send_keys(account_password)
-			myaccount.fp_pass_submit_cta.click
+			test_val.text_input(myaccount.fp_password_field, account_password, false, myaccount.fp_pass_submit_cta)
 			wait.until { myaccount.fp_error_msg.displayed? }
 
 			#Non-matching passwords
-			myaccount.fp_password_field.click
-			myaccount.fp_confirm_pass_field.send_keys("Aspen1231")
-			myaccount.fp_pass_submit_cta.click
+			test_val.text_input(myaccount.fp_confirm_pass_field, "Aspen1231", true, myaccount.fp_pass_submit_cta)
 			wait.until { myaccount.fp_error_msg.displayed? }
 
 			#Valid passwords
-			myaccount.fp_confirm_pass_field.clear
-			myaccount.fp_confirm_pass_field.send_keys(account_password)
-			myaccount.fp_pass_submit_cta.click
+			test_val.text_input(myaccount.fp_confirm_pass_field, account_password, false, myaccount.fp_pass_submit_cta)
 			wait.until { myaccount.fp_reset_message.displayed? }
 		end
 
@@ -243,6 +227,7 @@ describe "My Account functionality" do
 			$logger.info("Update password validation")
 			forsee.add_cookies();
 			parsed = JSON.parse(open("spec/page_titles.json").read)
+
 			login("guarantorNDNA", account_password)
 
 			#Navigate to update password page
@@ -251,29 +236,22 @@ describe "My Account functionality" do
 			wait.until { $test_driver.title.include? parsed["my-account"]["update-password"] }
 
 			#Valid password, but new pass is less than 8 characters
-			myaccount.pass_old.send_keys(account_password)
-			myaccount.pass_new.send_keys("Aa123!")
-			myaccount.pass_confirm.send_keys("Aa123!")
-			js_scroll_up(myaccount.pass_submit_cta)
-			myaccount.pass_submit_cta.click
-			#Check error message
-			expect(myaccount.pass_form_error.attribute("innerHTML").include? "at least 8 characters").to eql true
+			test_val.text_input(myaccount.pass_old, account_password, false)
+			test_val.text_input(myaccount.pass_new, "Aa123!", false)
+			test_val.text_input(myaccount.pass_confirm, "Aa123!", false, myaccount.pass_submit_cta)
+			test_val.error_msg(myaccount.pass_form_error, true, "at least 8 characters")
+
 
 			#Valid password, but new pass doesn't contain capital letter
-			myaccount.pass_new.clear
-			myaccount.pass_new.send_keys("aspen123!")
-			myaccount.pass_confirm.clear
-			myaccount.pass_confirm.send_keys("aspen123!")
-			myaccount.pass_submit_cta.click
-			expect(myaccount.pass_form_error.attribute("innerHTML").include? "at least 1 uppercase letter").to eql true
+			test_val.text_input(myaccount.pass_new, "aspen123!", true)
+			test_val.text_input(myaccount.pass_confirm, "aspen123!", false, myaccount.pass_submit_cta)
+			test_val.error_msg(myaccount.pass_form_error, true, "at least 1 uppercase letter")
+
 
 			#Valid password, but new pass doesn't contain special character
-			myaccount.pass_new.clear
-			myaccount.pass_new.send_keys("Aspen1231")
-			myaccount.pass_confirm.clear
-			myaccount.pass_confirm.send_keys("Aspen1231")
-			myaccount.pass_submit_cta.click
-			expect(myaccount.pass_form_error.attribute("innerHTML").include? "at least 1 special character").to eql true
+			test_val.text_input(myaccount.pass_new, "Aspen1231", true)
+			test_val.text_input(myaccount.pass_confirm, "Aspen1231", false, myaccount.pass_submit_cta)
+			test_val.error_msg(myaccount.pass_form_error, true, "at least 1 special character")
 		end
 
 		it " - Statements page" do
@@ -286,10 +264,18 @@ describe "My Account functionality" do
 			myaccount.my_account_statements_link.click
 			wait.until { $test_driver.title.include? parsed["my-account"]["statements"] }
 
-			if ENV['BROWSER_TYPE'] == "chrome"
+			#Check statement PDFs
+			if ENV['BROWSER_TYPE'] != "firefox" #Firefox doesn't like doing this for some reason
 				myaccount.statements.each do |statement|
-					#Make sure statement PDF links are valid
-					test_link_tab(statement, nil, statement.attribute("href"))
+					#Split URL
+					url = statement.attribute("href").split(".com/")
+					response = nil
+					Net::HTTP.start(url[0].split("https://").last + ".com", 80) {|http|
+						response = http.head("/" + url[1])
+					}
+					if(response.code != "200")
+						fail("Statement link returned code: " + response.code)
+					end
 				end
 			end
 
@@ -324,16 +310,22 @@ describe "My Account functionality" do
 			wait.until { myaccount.reschedule_modal.displayed? }
 
 			#Wait until days are displayed
-			wait_long.until { myaccount.reschedule_days(1,1).displayed? }
+			wait_long.until { myaccount.reschedule_day_header.displayed? }
 			#Click all days
 			for i in 1 .. 5
 				for j in 1 .. 7
-					myaccount.reschedule_days(i,j).click
+					begin
+						myaccount.reschedule_days(i,j).click
+					#Account for unavailable days
+					rescue Selenium::WebDriver::Error::NoSuchElementError
+						next
+					end
+					wait.until { myaccount.reschedule_days(i,j).attribute("class").include? "ui-state-active" }
 				end
 			end
 
 			#Click all times
-			wait.until { myaccount.reschedule_times(3,4).displayed? }
+			wait.until { myaccount.reschedule_time_header.displayed? }
 
 			for i in 1 .. 9
 				for j in 1 .. 2
@@ -343,6 +335,7 @@ describe "My Account functionality" do
 					rescue Selenium::WebDriver::Error::NoSuchElementError
 						next
 					end
+					wait.until { myaccount.reschedule_times(i,j).attribute("class").include? "is-selected" }
 				end
 			end
 
@@ -391,16 +384,18 @@ describe "My Account functionality" do
 				expect(myaccount.cancel_reason_dropdown_items(options[i]).attribute("aria-selected") == "true").to eql true
 			end
 
-			if ENV['BROWSER_TYPE'] != 'IE' #IE doesn't like this part for some reason
-				#Close modal
-				myaccount.cancel_close_link.click
+			#Close modal
+			myaccount.cancel_close_link.click
+			begin
 				wait_for_disappear(myaccount.cancel_modal,3)
-
-				#Re-open modal
-				js_scroll_up(myaccount.cancel_links[apt_no])
-				myaccount.cancel_links[apt_no].click
-				wait.until { myaccount.cancel_modal.displayed? }
+			rescue Selenium::WebDriver::Error::NoSuchElementError
+				#This is what we want
 			end
+
+			#Re-open modal
+			js_scroll_up(myaccount.cancel_links[apt_no])
+			myaccount.cancel_links[apt_no].click
+			wait.until { myaccount.cancel_modal.displayed? }
 
 			#Click reschedule CTA
 			sleep 1
@@ -436,33 +431,31 @@ describe "My Account functionality" do
 			open_map_modal()
 
 			expect(myaccount.map_billing_info.displayed?).to eql true
-			myaccount.map_edit_link.click
-			expect(myaccount.map_street_address.displayed?).to eql true
+			
+			num_retry = 0
+			begin
+				myaccount.map_edit_link.click
+				wait.until { myaccount.map_street_address.displayed? }
+			rescue Selenium::WebDriver::Error::TimeOutError
+				#Try again (thanks chrome!)
+				retry if (num_retry += 1) == 1
+			end
 			#Verify required fields
 			myaccount.map_street_address.clear
 			myaccount.map_city.clear
 			myaccount.map_state.clear
 			myaccount.map_zip.clear
 			myaccount.map_update_address_cta.click
-			expect(myaccount.map_street_address.attribute("class").include? "is-error").to eql true
-			expect(myaccount.map_city.attribute("class").include? "is-error").to eql true
-			expect(myaccount.map_state.attribute("class").include? "is-error").to eql true
-			expect(myaccount.map_zip.attribute("class").include? "is-error").to eql true
+			test_val.batch_check_highlights([myaccount.map_street_address,myaccount.map_city,myaccount.map_state,myaccount.map_zip])
 
 			#Numbers in city field
-			myaccount.map_city.send_keys("12345")
-			myaccount.map_update_address_cta.click
-			expect(myaccount.map_city.attribute("class").include? "is-error").to eql true
+			test_val.text_input(myaccount.map_city, "12345", true, myaccount.map_update_address_cta)
 
 			#Invalid state
-			myaccount.map_state.send_keys("ZZ")
-			myaccount.map_update_address_cta.click
-			expect(myaccount.map_state.attribute("class").include? "is-error").to eql true
+			test_val.text_input(myaccount.map_state, "ZZ", true, myaccount.map_update_address_cta)
 
 			#Invalid zip
-			myaccount.map_zip.send_keys("asdfj")
-			myaccount.map_update_address_cta.click
-			expect(myaccount.map_zip.attribute("class").include? "is-error").to eql true
+			test_val.text_input(myaccount.map_zip, "asdfj", true, myaccount.map_update_address_cta)
 
 			#Cancel CTA
 			myaccount.map_cancel_address_cta.click
@@ -481,14 +474,9 @@ describe "My Account functionality" do
 			myaccount.map_other_amount_check.click
 			myaccount.map_account_balance_check.click
 			myaccount.map_other_amount_check.click
-			myaccount.map_other_amount_field.send_keys("asdf")
-			myaccount.map_submit_cta.click
-			expect(myaccount.map_other_amount_field.attribute("class").include? "is-error").to eql true
+			test_val.text_input(myaccount.map_other_amount_field, "asdf", true, myaccount.map_submit_cta)
 			sleep 1
-			myaccount.map_other_amount_field.clear
-			myaccount.map_other_amount_field.send_keys("6.78")
-			myaccount.map_submit_cta.click
-			expect(myaccount.map_other_amount_field.attribute("class").include? "is-error").to eql false
+			test_val.text_input(myaccount.map_other_amount_field, "6.78", false, myaccount.map_submit_cta)
 		end
 
 		it " - Make a payment billing validation" do
@@ -516,40 +504,36 @@ describe "My Account functionality" do
 
 			# #Invalid CC number
 			sleep 1
-			myaccount.map_cc_no.send_keys("asl;dkfas;f")
-			myaccount.map_submit_cta.click
-			wait.until { myaccount.map_cc_no.attribute("class").include? "is-error" }
+			test_val.text_input(myaccount.map_cc_no,"asl;dkfas;f", true, myaccount.map_submit_cta)
 			#Valid CC number
 			sleep 1
-			myaccount.map_cc_no.clear
-			myaccount.map_cc_no.send_keys("4111111111111111")
-			myaccount.map_submit_cta.click
-			wait.until { !myaccount.map_cc_no.attribute("class").include? "is-error" }
+			test_val.text_input(myaccount.map_cc_no,"4111111111111111", false, myaccount.map_submit_cta)
 
 			#Invalid CVV
 			sleep 1
-			myaccount.map_cc_cvv.send_keys("asd")
-			myaccount.map_submit_cta.click
-			expect(myaccount.map_cc_cvv.attribute("class").include? "is-error").to eql true
+			test_val.text_input(myaccount.map_cc_cvv, "asd", true, myaccount.map_submit_cta)
 			#Valid CVV
 			sleep 1
-			myaccount.map_cc_cvv.clear
-			myaccount.map_cc_cvv.send_keys("123")
-			myaccount.map_submit_cta.click
-			expect(myaccount.map_cc_cvv.attribute("class").include? "is-error").to eql false
+			test_val.text_input(myaccount.map_cc_cvv, "123", false, myaccount.map_submit_cta)
 
 			#Invalid expiration date (defaults to invalid)
 			sleep 1
-			myaccount.map_submit_cta.click
-			wait.until { myaccount.map_cc_date_error.displayed? }
+			num_retry = 0
+			begin
+				myaccount.map_submit_cta.click
+				wait.until { myaccount.map_cc_date_error.displayed? }
+			rescue Selenium::WebDriver::Error::TimeOutError
+				retry if (num_retry += 1) == 1
+			end
 			#Valid expiration date
 			sleep 1
 			myaccount.map_cc_month.click
 			wait.until { myaccount.map_cc_month_item("02").displayed? }
 			myaccount.map_cc_month_item("02").click
 			myaccount.map_cc_year.click
-			wait.until { myaccount.map_cc_year_item(2017).displayed? }
-			myaccount.map_cc_year_item(2017).click
+			next_year = Date.today.year + 1
+			wait.until { myaccount.map_cc_year_item(next_year).displayed? }
+			myaccount.map_cc_year_item(next_year).click
 			myaccount.map_submit_cta.click
 			begin
 				wait.until { myaccount.map_cc_date_error.displayed? }
