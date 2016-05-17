@@ -38,6 +38,14 @@ class TwoColumnPage
 		return $test_driver.find_element(:class, "office-name")
 	end
 
+	def operated_info()
+		return $test_driver.find_element(:class, "office-owner")
+	end
+
+	def office_details()
+		return $test_driver.find_element(:class, "office-details")
+	end
+
 	def office_details_link()
 		return $test_driver.find_element(:partial_link_text, "Office Details")
 	end
@@ -48,6 +56,10 @@ class TwoColumnPage
 
 	def schedule_cta
 		return $test_driver.find_element(:link_text, "Schedule a New Patient Appointment")
+	end
+
+	def ADA_text() #According to the American Dental Association
+		return $test_driver.find_element(:class, "contact-number")
 	end
 
 	def youtube_player()

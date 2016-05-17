@@ -2,7 +2,7 @@ require 'spec_helper'
 
 #Re-usable test spec
 class TwoColumnSpec
-	#Allows us to use rspect stuff inside a class
+	#Allows us to use rspec stuff inside a class
 	include RSpec::Mocks::ExampleMethods::ExpectHost
   	include RSpec::Matchers 
 
@@ -32,6 +32,7 @@ class TwoColumnSpec
 	   		$test_driver.action.move_to(header.dropdown(drop_no)).perform
 		end
 
+		num_retry = 0
 		begin
 			#Click dropdown item
 			header.dropdown_link(drop_no,link_no).click
@@ -39,14 +40,15 @@ class TwoColumnSpec
 			@wait.until { $test_driver.title.include? expected_title }
 		rescue Selenium::WebDriver::Error::TimeOutError
 			#Try again
-			header.dropdown_link(drop_no,link_no).click
-			@wait.until { $test_driver.title.include? expected_title }
+			retry if (num_retry += 1) == 1
 		end
 	end
 
 	def test_closest_office_details(parent_title, sleep_after_back = false)
 		$logger.info("Office details")
-		wait = Selenium::WebDriver::Wait.new(timeout: 7)
+		timeout = 7
+		wait = Selenium::WebDriver::Wait.new(timeout: timeout)
+
 		wait.until { @two_column.closest_office_details.displayed? }
 		#Click office name
 		begin
@@ -55,42 +57,30 @@ class TwoColumnSpec
 			fail("Closest office details did not load in time on " + parent_title + " page")
 		end
 		office_name = @two_column.office_name.attribute("text").lstrip.split(",").first.tr('.','').downcase #Store office name (without state)
-		js_scroll_up(@two_column.office_name)
-		@two_column.office_name.click
-		#Make sure we ended up at the correct office page
-		@wait.until { $test_driver.title.downcase.include? office_name }
-		#Go back
-		$test_driver.navigate.back
-		@wait.until { $test_driver.title.include? parent_title }
+		test_link_back(@two_column.office_name, parent_title, office_name, true, timeout)
 		#Repeat with office details link
-		if sleep_after_back
-			sleep 2
-		end
-		@wait.until { @two_column.office_details_link.displayed? }
-		js_scroll_up(@two_column.office_details_link,true)
-		@two_column.office_details_link.click
-		@wait.until { $test_driver.title.downcase.include? office_name }
-		$test_driver.navigate.back
-		@wait.until { $test_driver.title.include? parent_title }
+		# if sleep_after_back
+		# 	sleep 2
+		# end
+		sleep 2
+
+		#Verify existance of "owned an operated by" and office details
+		expect(@two_column.operated_info.displayed?).to eql true
+		expect(@two_column.office_details.displayed?).to eql true
+
+		test_link_back(@two_column.office_details_link, parent_title, office_name, true, timeout)
 		#Find another office link
-		if sleep_after_back
-			sleep 2
-		end
-		@wait.until { @two_column.fao_link.displayed? }
-		js_scroll_up(@two_column.fao_link,true)
-		@two_column.fao_link.click
-		@wait.until { $test_driver.title.include? "Find a Dental Office" }
-		$test_driver.navigate.back
-		@wait.until { $test_driver.title.include? parent_title }
+		# if sleep_after_back
+		# 	sleep 2
+		# end
+		sleep 2
+		test_link_back(@two_column.fao_link, parent_title, "Find a Dental Office", false, timeout)
 		#Schedule appointment CTA
-		if sleep_after_back
-			sleep 2
-		end
-		@wait.until { @two_column.schedule_cta.displayed? }
-		js_scroll_up(@two_column.schedule_cta)
-		@two_column.schedule_cta.click
-		@wait.until { $test_driver.title.include? "Schedule a Dentist Appointment" }
-		$test_driver.navigate.back
+		# if sleep_after_back
+		# 	sleep 2
+		# end
+		sleep 2
+		test_link_back(@two_column.schedule_cta, parent_title, "Schedule a Dentist Appointment", false, timeout)
 	end
 
 	def test_breadcrumbs(second, third = nil, txSecond = nil, txThird = nil, fourth = nil, txFourth = nil)
@@ -170,12 +160,17 @@ class TwoColumnSpec
 	end #End def
 
 
-	def test_youtube_player()
+	def test_youtube_player(no_text = false)
+		$logger.info("Youtube video")
+		#Check for "According to the American Dental Association" text
+		if(!no_text)
+			expect(@two_column.ADA_text.attribute("innerHTML").include? "According to the American Dental Association").to eql true
+		end
+
 		#IE doesn't like this at all
 		if ENV['BROWSER_TYPE'] == 'IE'
 			return
 		end
-		$logger.info("Youtube video")
 
 		#Give firefox a minute, he's a little... slow
 		if ENV['BROWSER_TYPE'] == 'FIREFOX'

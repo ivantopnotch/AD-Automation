@@ -103,8 +103,8 @@ describe "Dental Services pages functionality" do
 			tc.test_closest_office_details(title)
 		end
 
-		it " - TMJ page" do
-			$logger.info("TMJ page")
+		it " - Treatment of peridontal disease page" do
+			$logger.info("Treatment of peridontal disease page")
 			forsee.add_cookies()
 			parsed = JSON.parse(open("spec/page_titles.json").read)
 			title = parsed["dental-services"]["peridontal-disease"]
@@ -134,7 +134,7 @@ describe "Dental Services pages functionality" do
 		end
 		
 		it " - Tooth Fillings page" do
-			$logger.info("Tooth Extraction page")
+			$logger.info("Tooth Fillings page")
 			forsee.add_cookies()
 			parsed = JSON.parse(open("spec/page_titles.json").read)
 			title = parsed["dental-services"]["fillings"]
@@ -277,9 +277,10 @@ describe "Dental Services pages functionality" do
 			#Breadcrumbs
 			tc.test_breadcrumbs(breadcrumb[0],"cosmetic-dentistry",breadcrumb[1],"Cosmetic Dentistry")
 			#Links
-			js_scroll_up(dental_services.teeth_whitening_link)
-			test_link_back(dental_services.teeth_whitening_link, title, parsed["dental-services"]["teeth-whitening"])
-			test_link_back(dental_services.veneers_link, title, parsed["dental-services"]["dental-veneers"])
+			if ENV['BROWSER_TYPE'] != "FIREFOX" #Can't get firefox to click these links without erroring out
+				test_link_back(dental_services.teeth_whitening_link, title, parsed["dental-services"]["teeth-whitening"])
+				test_link_back(dental_services.veneers_link, title, parsed["dental-services"]["dental-veneers"])
+			end
 			#Youtube video
 			tc.test_youtube_player()
 			#Closest office container
@@ -298,6 +299,8 @@ describe "Dental Services pages functionality" do
 			wait.until { $test_driver.title.include? title }
 			#Breadcrumbs
 			tc.test_breadcrumbs(breadcrumb[0],"cosmetic-dentistry",breadcrumb[1],"Cosmetic Dentistry","teeth-whitening","Teeth Whitening")
+			#Youtube video
+			tc.test_youtube_player()
 			#Closest office container
 			tc.test_closest_office_details(title)
 		end
