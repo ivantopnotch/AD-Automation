@@ -45,6 +45,30 @@ class MyAccountPage
 		return $test_driver.find_element(:link_text, "Forgot your password?")
 	end
 
+	#Perform login
+	def perform_login(username, password)
+		header = HeaderPage.new()
+		wait = Selenium::WebDriver::Wait.new(timeout: 3)
+		wait_long = Selenium::WebDriver::Wait.new(timeout: 7)
+		test_val = TestValidation.new()
+
+		header.my_account_cta.click
+		wait.until { $test_driver.current_url.include? "/my-account/login" }
+		
+		num_retry = 0
+		begin
+			test_val.text_input(username_field, username, false)
+			test_val.text_input(password_field, password, false)
+			login_form.submit
+			wait_long.until { make_a_payment_link.displayed? }
+		rescue Selenium::WebDriver::Error::TimeOutError
+			#Try again (thanks chrome)
+			sleep 1
+			retry if (num_retry += 1) == 1
+			fail("Failed to login as user: " + username + " Pass: " + password)
+		end
+	end
+
 	#Forgot username (fu) modal
 	def fu_container()
 		return $test_driver.find_element(:id, "forgot-username-container")

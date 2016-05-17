@@ -2,30 +2,6 @@ require 'spec_helper'
 require 'test_validation'
 require 'net/http'
 
-def login(username, password)
-	myaccount = MyAccountPage.new()
-	header = HeaderPage.new()
-	wait = Selenium::WebDriver::Wait.new(timeout: 3)
-	wait_long = Selenium::WebDriver::Wait.new(timeout: 7)
-	test_val = TestValidation.new()
-
-	header.my_account_cta.click
-	wait.until { $test_driver.current_url.include? "/my-account/login" }
-	
-	num_retry = 0
-	begin
-		test_val.text_input(myaccount.username_field, username, false)
-		test_val.text_input(myaccount.password_field, password, false)
-		myaccount.login_form.submit
-		wait_long.until { myaccount.make_a_payment_link.displayed? }
-	rescue Selenium::WebDriver::Error::TimeOutError
-		#Try again (thanks chrome)
-		sleep 1
-		retry if (num_retry += 1) == 1
-		fail("Failed to login as user: " + username + " Pass: " + password)
-	end
-end
-
 def open_map_modal()
 	#Open make a payment modal
 	myaccount = MyAccountPage.new()
@@ -104,8 +80,7 @@ describe "My Account functionality" do
 				wait.until { myaccount.fu_container.displayed? }
 			rescue Selenium::WebDriver::Error::TimeOutError
 				#Try again
-				num_retry += 1
-				retry if num_retry == 1
+				retry if (num_retry += 1) == 1
 				fail("Forgot username modal failed to open")
 			end
 
@@ -149,8 +124,7 @@ describe "My Account functionality" do
 				wait.until { myaccount.fp_container.displayed? }
 			rescue Selenium::WebDriver::Error::TimeOutError
 				#Try again
-				num_retry += 1
-				retry if num_retry == 1
+				retry if (num_retry += 1) == 1
 				fail("Forgot password modal failed to open")
 			end
 
@@ -198,7 +172,7 @@ describe "My Account functionality" do
 			$logger.info("My Account (Guarantor) page")
 			forsee.add_cookies()
 
-			login("guarantorNDNA", account_password)
+			myaccount.perform_login("guarantorNDNA", account_password)
 
 			#Verify elements
 			expect(myaccount.welcome_text.displayed?).to eql true
@@ -228,7 +202,7 @@ describe "My Account functionality" do
 			forsee.add_cookies();
 			parsed = JSON.parse(open("spec/page_titles.json").read)
 
-			login("guarantorNDNA", account_password)
+			myaccount.perform_login("guarantorNDNA", account_password)
 
 			#Navigate to update password page
 			js_scroll_up(myaccount.update_password_link)
@@ -258,14 +232,14 @@ describe "My Account functionality" do
 			$logger.info("Statements page")
 			forsee.add_cookies();
 			parsed = JSON.parse(open("spec/page_titles.json").read)
-			login("Stateme1", account_password)
+			myaccount.perform_login("Stateme1", account_password)
 
 			#Navigate to update password page
 			myaccount.my_account_statements_link.click
 			wait.until { $test_driver.title.include? parsed["my-account"]["statements"] }
 
 			#Check statement PDFs
-			if ENV['BROWSER_TYPE'] != "firefox" #Firefox doesn't like doing this for some reason
+			if ENV['BROWSER_TYPE'] != "FIREFOX" #Firefox doesn't like doing this for some reason
 				myaccount.statements.each do |statement|
 					#Split URL
 					url = statement.attribute("href").split(".com/")
@@ -290,7 +264,7 @@ describe "My Account functionality" do
 			forsee.add_cookies();
 			parsed = JSON.parse(open("spec/page_titles.json").read)
 			title = parsed["my-account"]["manage-appointments"]
-			login("GuarantorW50", account_password)
+			myaccount.perform_login("GuarantorW50", account_password)
 
 			#Verify reschedule cta
 			expect(myaccount.reschedule_cta.displayed?).to eql true
@@ -361,7 +335,7 @@ describe "My Account functionality" do
 			forsee.add_cookies();
 			parsed = JSON.parse(open("spec/page_titles.json").read)
 			title = parsed["my-account"]["manage-appointments"]
-			login("GuarantorW50", account_password)
+			myaccount.perform_login("GuarantorW50", account_password)
 
 			#Navigate to page
 			js_scroll_up(myaccount.manage_appointments_link)
@@ -407,7 +381,7 @@ describe "My Account functionality" do
 			$logger.info("My Account (dependant) page")
 			forsee.add_cookies();
 			parsed = JSON.parse(open("spec/page_titles.json").read)
-			login("DependentWMA", account_password)
+			myaccount.perform_login("DependentWMA", account_password)
 
 			#Verify differences from guarantor version
 			expect(myaccount.my_account_statements_link.displayed?).to eql false
@@ -426,7 +400,7 @@ describe "My Account functionality" do
 			$logger.info("Make a payment billing address")
 			forsee.add_cookies();
 			parsed = JSON.parse(open("spec/page_titles.json").read)
-			login("guarantorNDNA", account_password)
+			myaccount.perform_login("guarantorNDNA", account_password)
 
 			open_map_modal()
 
@@ -466,7 +440,7 @@ describe "My Account functionality" do
 			$logger.info("Make a payment amount validation")
 			forsee.add_cookies();
 			parsed = JSON.parse(open("spec/page_titles.json").read)
-			login("guarantorNDNA", account_password)
+			myaccount.perform_login("guarantorNDNA", account_password)
 
 			open_map_modal()
 
@@ -483,7 +457,7 @@ describe "My Account functionality" do
 			$logger.info("Make a payment billing ")
 			forsee.add_cookies();
 			parsed = JSON.parse(open("spec/page_titles.json").read)
-			login("guarantorNDNA", account_password)
+			myaccount.perform_login("guarantorNDNA", account_password)
 
 			open_map_modal()
 
@@ -548,7 +522,7 @@ describe "My Account functionality" do
 			$logger.info("Account Message DNI")
 			forsee.add_cookies();
 			parsed = JSON.parse(open("spec/page_titles.json").read)
-			login("guarantorNDNA", account_password)
+			myaccount.perform_login("guarantorNDNA", account_password)
 
 			myaccount.tools_manage_appointments.click
 			wait.until { $test_driver.title.include? parsed["my-account"]["manage-appointments"] }

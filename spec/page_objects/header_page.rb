@@ -23,7 +23,7 @@ class HeaderPage
   end
 
   def my_account_cta()
-    return $test_driver.find_element(:class, "nav-cta-description").find_element(:xpath, "//a[text() = 'My Account']")
+    return $test_driver.find_element(:class, "nav-cta-description").find_element(:xpath, "//ul[@id='cta-nav']/li[@class='nav-item account-menu']/a[@class='nav-cta-description']")
   end
 
   #Dropdowns and their links
@@ -33,6 +33,40 @@ class HeaderPage
 
   def dropdown_link(drop_no, link_no)
     return $test_driver.find_element(:xpath, "//nav[@id='site-nav-wrapper']/ul[@class='site-nav']/li[@class='nav-item-wrapper']["+drop_no.to_s+"]/ul//li["+link_no.to_s+"]/a")
+  end
+
+  #My account dropdown stuff
+  def view_account_cta()
+    return $test_driver.find_element(:xpath => "//div[@class='account-dropdown logged']/a[@class='button']")
+  end
+
+  def log_out_link()
+    return $test_driver.find_element(:xpath => "//div[@class='account-dropdown logged']/a[@class='logout']")
+  end
+
+  def sign_in_cta()
+    return $test_driver.find_element(:xpath => "//div[@class='account-dropdown']/a[@class='button']")
+  end
+
+  def sign_up_link()
+    return $test_driver.find_element(:xpath => "//div[@class='account-dropdown']/a[2]")
+  end
+
+  #Search page stuff
+  def search_form()
+    return $test_driver.find_element(:id, "search-field") #id is serach field, but is actually the <form> tag
+  end
+
+  def search_field()
+    return $test_driver.find_element(:xpath => "//form[@id='search-field']/input[@class='text-field']")
+  end
+
+  def search_keyword()
+    return $test_driver.find_element(:class, "search-keyword")
+  end
+
+  def search_results()
+    return $test_driver.find_elements(:xpath => "//div[@class='search-options padded-vertical']/div[@class='content-box']/a")
   end
 
 end
