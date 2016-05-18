@@ -65,7 +65,7 @@ class TwoColumnSpec
 		sleep 2
 
 		#Verify existance of "owned an operated by" and office details
-		expect(@two_column.operated_info.displayed?).to eql true
+		wait.until { @two_column.operated_info.displayed? }
 		expect(@two_column.office_details.displayed?).to eql true
 
 		test_link_back(@two_column.office_details_link, parent_title, office_name, true, timeout)

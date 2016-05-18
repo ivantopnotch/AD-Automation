@@ -45,6 +45,14 @@ class MyAccountPage
 		return $test_driver.find_element(:link_text, "Forgot your password?")
 	end
 
+	def no_account_container()
+		return $test_driver.find_element(:xpath => "//div[@class='grid-half'][2]/div[@class='login-column']")
+	end
+
+	def sign_up_cta()
+		return $test_driver.find_element(:link_text, "Sign Up for My Account")
+	end
+
 	#Perform login
 	def perform_login(username, password)
 		header = HeaderPage.new()
@@ -145,6 +153,10 @@ class MyAccountPage
 		return $test_driver.find_element(:xpath => "//div[@id='account-info']/div[@class='contact-info-wrapper grid-third']/p[@class='account-title']/a[@class='logout']")
 	end
 
+	def holder_info()
+		return $test_driver.find_element(:class, "account-holder")
+	end
+
 	def welcome_text()
 		return $test_driver.find_element(:xpath => "//div[@id='account-info']/div[@class='contact-info-wrapper grid-third']/p[@class='account-title']")
 	end
@@ -155,6 +167,31 @@ class MyAccountPage
 
 	def empty_notification()
 		return $test_driver.find_element(:xpath => "//div[@id='account-info']/div[@class='welcome-patient-wrapper grid-two-thirds']/div[@class='appointments-box']/div[@class='notification empty']")
+	end
+
+	#Appointment messaging section
+	def apt_next()
+		return $test_driver.find_element(:class, "next-appointment")
+	end
+
+	def apt_prev()
+		return $test_driver.find_element(:class, "previous-appointment")
+	end
+
+	def apt_slide(i)
+		return $test_driver.find_element(:xpath => "//div[@class='slick-track']/div["+i.to_s+"]")
+	end
+
+	def apt_wrappers()
+		return $test_driver.find_elements(:xpath => "//div[@class='slick-track']/div/div[@class='appointment-wrapper']")
+	end
+
+	def apt_slide_dates()
+		return $test_driver.find_elements(:class, "schedule-date")
+	end
+
+	def man_apt_link()
+		return $test_driver.find_element(:link_text, "MANAGE ALL APPOINTMENTS")
 	end
 
 	#My Account links
@@ -181,6 +218,10 @@ class MyAccountPage
 	#Account information links
 	def account_info_statements()
 		return $test_driver.find_element(:xpath => "//div[@class='content']/div[@class='grid-whole'][1]/div[@class='grid-4'][1]/div[@class='section-block statements-info']/a[@class='title']")
+	end
+
+	def current_statement()
+		return $test_driver.find_element(:class, "pdf_image")
 	end
 
 	#Tools and resources links

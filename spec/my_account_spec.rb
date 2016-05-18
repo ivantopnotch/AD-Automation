@@ -35,34 +35,44 @@ describe "My Account functionality" do
 		it " - Sign in page validation" do
 			$logger.info("Sign in page validaton")
 			forsee.add_cookies()
+			parsed = JSON.parse(open("spec/page_titles.json").read)
+			title = parsed["my-account"]["sign-in"]
 			#Navigate to page
 			header.my_account_cta.click
-			wait.until { $test_driver.current_url.include? "/my-account/login" }
+			#wait.until { $test_driver.current_url.include? "/my-account/login" }
+			wait.until { $test_driver.title.include? title }
+
+			#Don't have an account tile
+			expect(myaccount.no_account_container.displayed?).to eql true
+			test_link_back(myaccount.sign_up_cta, title, parsed["my-account"]["sign-up"])
 
 			#Valid username, invalid password
 			test_val.text_input(myaccount.username_field, "guarantorNDNA")
 			test_val.text_input(myaccount.password_field, "asdfjkl")
-			myaccount.login_form.submit
+			#myaccount.login_form.submit
+			myaccount.sign_in_cta.click
 			#test_val.error_msg(myaccount.form_error_msg, true, nil, true)
 			wait_long.until {myaccount.form_error_msg.displayed? }
 
 			#Invalid username, valid password
 			test_val.text_input(myaccount.username_field, "a")
 			test_val.text_input(myaccount.password_field, "Valid987$")
-			myaccount.login_form.submit
+			#myaccount.login_form.submit
+			myaccount.sign_in_cta.click
 			test_val.error_msg(myaccount.form_uname_msg, true)
 
 			#Invalid username, invalid password
 			test_val.text_input(myaccount.username_field, "a")
 			test_val.text_input(myaccount.password_field, "Valid987$")
-			myaccount.login_form.submit
+			#myaccount.login_form.submit
+			myaccount.sign_in_cta.click
 			test_val.error_msg(myaccount.form_uname_msg, true)
 
 			#Valid username, valid password
 			test_val.text_input(myaccount.username_field, "guarantorNDNA")
 			test_val.text_input(myaccount.password_field, account_password)
-			#myaccount.sign_in_cta.click
-			myaccount.login_form.submit
+			myaccount.sign_in_cta.click
+			#myaccount.login_form.submit
 			Selenium::WebDriver::Wait.new(timeout: 15, message: "My Account page failed to load in time after signing in").until { myaccount.sign_out_link.displayed? }
 		end
 
@@ -171,12 +181,17 @@ describe "My Account functionality" do
 		it " - My Account (Guarantor) page" do
 			$logger.info("My Account (Guarantor) page")
 			forsee.add_cookies()
+			fname = "Lee"
+			lname = "Biddlecome"
 
-			myaccount.perform_login("guarantorNDNA", account_password)
+			myaccount.perform_login("stateme1", account_password)
 
 			#Verify elements
 			expect(myaccount.welcome_text.displayed?).to eql true
+			expect(myaccount.welcome_text.attribute("innerHTML").include? "Welcome back " + fname).to eql true
 			expect(myaccount.sign_out_link.displayed?).to eql true
+			expect(myaccount.holder_info.displayed?).to eql true
+			expect(myaccount.holder_info.attribute("innerHTML").include? fname + " " + lname).to eql true
 			expect(myaccount.office_details.displayed?).to eql true
 			expect(myaccount.empty_notification.displayed?).to eql true
 
@@ -195,6 +210,78 @@ describe "My Account functionality" do
 			test_link_back(myaccount.tools_manage_appointments, title, parsed["my-account"]["manage-appointments"])
 
 			test_link_back(myaccount.profile_update_password_link, title, parsed["my-account"]["update-password"])
+
+			#Latest statement pdf
+			wait.until { myaccount.current_statement.displayed? }
+			# if ENV['BROWSER_TYPE'] != "FIREFOX" #Firefox doesn't like doing this for some reason
+			# 	url = myaccount.current_statement.attribute("href").split(".com/")
+			# 	response = nil
+			# 	Net::HTTP.start(url[0].split("https://").last + ".com", 80) {|http|
+			# 		response = http.head("/" + url[1])
+			# 	}
+			# 	if(response.code != "200")
+			# 		fail("Statement link returned code: " + response.code)
+			# 	end
+			# end
+		end
+
+		it " - Appointment messaging section" do
+			$logger.info("Appointment messaging section")
+			forsee.add_cookies();
+			parsed = JSON.parse(open("spec/page_titles.json").read)
+		 	title = parsed["my-account"]["my-account"]
+
+			myaccount.perform_login("GuarantorW50", account_password)
+
+			#First slide should be showing
+			wait.until { myaccount.apt_slide(1).displayed? }
+			#Test next arrow
+			myaccount.apt_next.click
+			wait.until { myaccount.apt_slide(2).attribute("class").include? "slick-current"}
+			#Test prev arrow
+			sleep 1
+			myaccount.apt_prev.click
+			sleep 1
+			wait.until { myaccount.apt_slide(1).attribute("class").include? "slick-current"}
+
+			#Check order of appointments
+			prev_date = nil
+			prev_time = nil
+			prev_ampm = nil
+			myaccount.apt_wrappers.each do |wrapper|
+				#Thankfully this tag contains json data for appointment
+				apt_data = JSON.parse(wrapper.attribute("data-appointment"))
+				date = apt_data["Date"].split("-") #1 = month, 2 = day
+				time = apt_data["StartTime"].split(":") #0 = hour, 1 = minute
+
+				if prev_date != nil && prev_time != nil
+					#Build failure string
+					fail_string = "Appointment " + date[1] + "/" + date[2] + " " + time[0] + ":" + time[1]
+					fail_string += " appears in wrong order compared to "
+					fail_string += prev_date[1] + "/" + prev_date[2] + " " + prev_time[0] + ":" + prev_time[1]
+
+					#Check for wrong day order, if not new month
+					if (prev_date[1] == date[1]) && (prev_date[2].to_i > date[2].to_i)
+						fail(fail_string)
+					end
+
+					#Check for wrong hour order, if not new day
+					if (prev_date[2] == date[2]) && (prev_time[0].to_i > time[0].to_i)
+						fail(fail_string)
+					end
+
+					#Check for wrong minute order, if not new hour
+					if (prev_time[0] == time[0]) && (prev_time[1].to_i > time[1].to_i)
+						fail(fail_string)
+					end
+				end
+				#For next go-around
+				prev_date = date
+				prev_time = time
+			end
+
+			#Click manage appointments link
+			test_link_back(myaccount.man_apt_link, title, parsed["my-account"]["manage-appointments"])
 		end
 
 		it " - Update password page validation" do

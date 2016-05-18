@@ -221,7 +221,7 @@ describe "Oral Health pages functionality" do
 				js_scroll_up(elem,true)
 				elem.click
 				# Make sure we are anchored to the id
-				wait.until { oral_health.anchor(elem.attribute("href")) }
+				wait.until { oral_health.anchor(elem.attribute("href")).displayed? }
 			end
 
 			#Test all 'Back to top' links
