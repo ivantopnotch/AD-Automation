@@ -223,6 +223,9 @@ describe "My Account functionality" do
 			# 		fail("Statement link returned code: " + response.code)
 			# 	end
 			# end
+
+			#Account balance
+			expect(myaccount.account_balance.displayed?).to eql true
 		end
 
 		it " - Appointment messaging section" do
@@ -321,7 +324,7 @@ describe "My Account functionality" do
 			parsed = JSON.parse(open("spec/page_titles.json").read)
 			myaccount.perform_login("Stateme1", account_password)
 
-			#Navigate to update password page
+			#Navigate to statements page
 			myaccount.my_account_statements_link.click
 			wait.until { $test_driver.title.include? parsed["my-account"]["statements"] }
 
@@ -346,6 +349,40 @@ describe "My Account functionality" do
 			test_link_tab(myaccount.here_link, nil, "get.adobe.com/reader")
 		end
 
+		it " - Appointments page (no appointments)" do
+			$logger.info("Appointments page (no appointments)")
+			forsee.add_cookies();
+			parsed = JSON.parse(open("spec/page_titles.json").read)
+
+			myaccount.perform_login("guarantorNDNA", account_password)
+
+			#Navigate to appointments page
+			myaccount.manage_appointments_link.click
+			wait.until { $test_driver.title.include? parsed["my-account"]["manage-appointments"] }
+
+			#Verify no appointments message
+			expect(myaccount.no_appointments.displayed?).to eql true
+			expect(myaccount.no_appointments.attribute("innerHTML").include? "Our records indicate that you don't have any upcoming appointments.").to eql true
+		end
+
+		it " - Appointments page (with appointments)" do
+			$logger.info("Appointments page (with appointments)")
+			forsee.add_cookies();
+			parsed = JSON.parse(open("spec/page_titles.json").read)
+
+			myaccount.perform_login("GuarantorW50", account_password)
+
+			#Navigate to appointments page
+			myaccount.manage_appointments_link.click
+			wait.until { $test_driver.title.include? parsed["my-account"]["manage-appointments"] }
+
+			#Verify elements
+			expect(myaccount.no_of_apt.displayed?).to eql true
+			expect(myaccount.reschedule_ctas.length > 0).to eql true
+			expect(myaccount.cancel_links.length > 0).to eql true
+			expect(myaccount.apt_data_containers.length > 0).to eql true
+		end
+
 		it " - Reschedule appointment" do
 			$logger.info("Reschedule appointment")
 			forsee.add_cookies();
@@ -353,10 +390,10 @@ describe "My Account functionality" do
 			title = parsed["my-account"]["manage-appointments"]
 			myaccount.perform_login("GuarantorW50", account_password)
 
-			#Verify reschedule cta
+			#Verify reschedule cta on my account page
 			expect(myaccount.reschedule_cta.displayed?).to eql true
 
-			#Navigate to page
+			#Navigate to manage appointments page
 			js_scroll_up(myaccount.manage_appointments_link)
 			myaccount.manage_appointments_link.click
 			wait.until { $test_driver.title.include? title }
@@ -366,6 +403,23 @@ describe "My Account functionality" do
 			test_link_back(myaccount.reschedule_office_links[apt_no],title,parsed["office"]["about-office"])
 
 			#Open modal
+			expect(myaccount.reschedule_ctas[apt_no].displayed?).to eql true
+			myaccount.reschedule_ctas[apt_no].click
+			wait.until { myaccount.reschedule_modal.displayed? }
+
+			#Verify elements
+			expect(myaccount.reschedule_header.attribute("innerHTML").include? "Reschedule an appointment").to eql true
+			expect(myaccount.reschedule_apt_name.displayed?).to eql true
+			expect(myaccount.reschedule_apt_patient_info.displayed?).to eql true
+			expect(myaccount.reschedule_office_details.attribute("innerHTML").include? "Your Office:").to eql true
+
+			#Verify X to close modal
+			expect(myaccount.reschedule_x.displayed?).to eql true
+			sleep 1
+			myaccount.reschedule_x.click
+			wait_for_disappear(myaccount.reschedule_modal)
+
+			#Re-open modal
 			expect(myaccount.reschedule_ctas[apt_no].displayed?).to eql true
 			myaccount.reschedule_ctas[apt_no].click
 			wait.until { myaccount.reschedule_modal.displayed? }
@@ -403,6 +457,40 @@ describe "My Account functionality" do
 			#Submit and check success
 			myaccount.reschedule_submit_cta.click
 			wait_long.until { myaccount.reschedule_apt_time.displayed? }
+		end
+
+		it " - Reschedule success modal" do
+			$logger.info("Reschedule success modal")
+			forsee.add_cookies();
+			parsed = JSON.parse(open("spec/page_titles.json").read)
+			title = parsed["my-account"]["manage-appointments"]
+			myaccount.perform_login("GuarantorW50", account_password)
+
+			for i in 0 .. 1
+				myaccount.reschedule_cta.click
+				wait.until { myaccount.reschedule_modal.displayed? }
+				wait_long.until { myaccount.reschedule_time_header.displayed? }
+				sleep 3
+				myaccount.reschedule_submit_cta.click
+				wait_long.until { myaccount.confirm_message.displayed? }
+
+				if i == 0
+					myaccount.reschedule_x.click
+					begin
+						wait.until { !myaccount.reschedule_modal.displayed? }
+					rescue Selenium::WebDriver::Error::TimeOutError
+						#Good
+					end
+					sleep 3
+				end
+			end
+
+			#Verify elements
+			expect(myaccount.reschedule_header.attribute("innerHTML").include? "Reschedule an appointment").to eql true
+			expect(myaccount.confirm_message.attribute("innerHTML").include? "Thank you for your request. We'll send a confirmation email").to eql true
+			expect(myaccount.confirm_subtitle.attribute("innerHTML").include? "New Appointment Details").to eql true
+			expect(myaccount.reschedule_apt_time.attribute("innerHTML").include? "PM" || myaccount.reschedule_apt_time.attribute("innerHTML").include? "AM").to eql true
+			expect(myaccount.reschedule_office_details.displayed?).to eql true
 
 			#Check links
 			test_link_tab(myaccount.reschedule_google_cal_link,"Calendar")
@@ -424,7 +512,31 @@ describe "My Account functionality" do
 			title = parsed["my-account"]["manage-appointments"]
 			myaccount.perform_login("GuarantorW50", account_password)
 
-			#Navigate to page
+			#Verify cancel link on my account page
+			wait.until { myaccount.cancel_links[0].displayed? }
+			myaccount.cancel_links[0].click
+			wait.until { myaccount.cancel_modal.displayed? }
+			#Verify elements
+			expect(myaccount.cancel_modal_header.attribute("innerHTML").include? "Cancel an appointment").to eql true
+			expect(myaccount.cancel_copy.attribute("innerHTML").include? "Are you sure you want to cancel the following appointment?").to eql true
+			expect(myaccount.cancel_apt_details.attribute("innerHTML").include? "Appointment details").to eql true
+			expect(myaccount.cancel_yes_copy.attribute("innerHTML").include? "Yes, I want to cancel my appointment").to eql true
+			expect(myaccount.cancel_reason_question.attribute("innerHTML").include? "What was the primary reason for cancelling your appointment?").to eql true
+			expect(myaccount.cancel_required_message.attribute("innerHTML").include? "Required Field").to eql true
+			#Verify appointment details
+			expect(myaccount.cancel_apt_time.displayed?).to eql true
+			#Verify office details
+			expect(myaccount.cancel_office_details.displayed?).to eql true
+			#Verify X to close modal
+			myaccount.cancel_modal_x.click
+			begin
+				wait_for_disappear(myaccount.cancel_modal,3)
+			rescue Selenium::WebDriver::Error::TimeOutError
+				#Good
+			end
+			sleep 1
+
+			#Navigate to manage accounts page
 			js_scroll_up(myaccount.manage_appointments_link)
 			myaccount.manage_appointments_link.click
 			wait.until { $test_driver.title.include? title }
@@ -435,6 +547,11 @@ describe "My Account functionality" do
 			js_scroll_up(myaccount.cancel_links[apt_no])
 			myaccount.cancel_links[apt_no].click
 			wait.until { myaccount.cancel_modal.displayed? }
+
+			#Attempt to submit without selecting reason
+			sleep 1
+			myaccount.cancel_submit.click
+			wait.until { myaccount.cancel_reason_dropdown.attribute("style").include? "border-color: red"} #Doesn't use the 'is-error' class for some reason?
 
 			#Click all reasons
 			sleep 1
@@ -481,6 +598,10 @@ describe "My Account functionality" do
 			else
 				fail("Statements link appears on dependant page")
 			end
+
+			#Make sure we can't manually navigate to statements page
+			$test_driver.navigate.to($test_driver.current_url + "/statements")
+			wait.until { $test_driver.title.include? parsed["my-account"]["my-account"] }
 		end
 
 		it " - Make a payment billing address" do
@@ -538,6 +659,17 @@ describe "My Account functionality" do
 			test_val.text_input(myaccount.map_other_amount_field, "asdf", true, myaccount.map_submit_cta)
 			sleep 1
 			test_val.text_input(myaccount.map_other_amount_field, "6.78", false, myaccount.map_submit_cta)
+
+			#Click X in top right of modal
+			sleep 1
+			js_scroll_up(myaccount.map_modal_x,true)
+			myaccount.map_modal_x.click
+			sleep 1
+			begin
+				expect(myaccount.map_modal.displayed?).to eql false
+			rescue Selenium::WebDriver::Error::NoSuchElementError
+				#This is what we want
+			end
 		end
 
 		it " - Make a payment billing validation" do

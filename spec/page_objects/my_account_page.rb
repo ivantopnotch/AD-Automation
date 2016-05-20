@@ -169,6 +169,10 @@ class MyAccountPage
 		return $test_driver.find_element(:xpath => "//div[@id='account-info']/div[@class='welcome-patient-wrapper grid-two-thirds']/div[@class='appointments-box']/div[@class='notification empty']")
 	end
 
+	def account_balance()
+		return $test_driver.find_element(:xpath => "//div[@class='balance-cta']/div[@class='grid-half'][1]/h1")
+	end
+
 	#Appointment messaging section
 	def apt_next()
 		return $test_driver.find_element(:class, "next-appointment")
@@ -234,9 +238,26 @@ class MyAccountPage
 		return $test_driver.find_element(:xpath => "//div[@class='content']/div[@class='grid-whole'][1]/div[@class='grid-4 middle-grid']/div[@class='section-block']/a[@class='title pencil']")
 	end
 
+	#Manage appointments page
+	def no_appointments()
+		return $test_driver.find_element(:xpath => "//div[@id='manage-appointments']/div[@class='main']/div[@class='grid-8']/div[@class='content']/div/p")
+	end
+
+	def no_of_apt()
+		return $test_driver.find_element(:class, "total-app-count")
+	end
+
+	def apt_data_containers()
+		return $test_driver.find_elements(:class, "appointment-data")
+	end
+
 	#Make a payment modal
 	def map_modal()
 		return $test_driver.find_element(:xpath => "//div[@class='modal-content grid-two-thirds modal make-payment-modal  modal-global']")
+	end
+
+	def map_modal_x()
+		return $test_driver.find_element(:xpath => "//span[@class='icon icon-cancel-circle modal-close']")
 	end
 
 	def map_account_balance_check()
@@ -387,6 +408,26 @@ class MyAccountPage
 		return $test_driver.find_element(:id, "reschedule-appointment")
 	end
 
+	def reschedule_header()
+		return $test_driver.find_element(:xpath => "//form[@id='reschedule-appointment']/h3[@class='bar']")
+	end
+
+	def reschedule_x()
+		return $test_driver.find_element(:xpath => "//span[@class='icon icon-cancel-circle modal-cancel-close']")
+	end
+
+	def reschedule_apt_name()
+		return $test_driver.find_element(:class, "appointment-name")
+	end
+
+	def reschedule_apt_patient_info()
+		return $test_driver.find_element(:class, "patient-info")
+	end
+
+	def reschedule_office_details()
+		return $test_driver.find_element(:xpath => "//div[@class='content-box upcoming-info']/div[@class='patient-info grid-whole']/div[@class='grid-half'][2]/dl[1]/dt[1]")
+	end
+
 	def reschedule_office_links()
 		return $test_driver.find_elements(:class, "appointment-detail-title")
 	end
@@ -407,13 +448,25 @@ class MyAccountPage
 		return $test_driver.find_element(:xpath => "//div[@id='appointment-time']/div[@class='grid-half']["+column.to_s+"]/ol/li["+row.to_s+"]/a")
 	end
 
-	#Used for checking success
-	def reschedule_apt_time()
-		return $test_driver.find_element(:xpath => "//form[@id='reschedule-appointment']/div[@class='content-box']/div[@class='upcoming-info']/div[@class='patient-info grid-whole']/div[@class='grid-half'][1]/p[@class='schedule-time']")
-	end
-
 	def reschedule_submit_cta()
 		return $test_driver.find_element(:class, "save-link")
+	end
+
+	#Success modal
+	def confirm_message()
+		return $test_driver.find_element(:class, "confirm-message")
+	end
+
+	def confirm_subtitle()
+		return $test_driver.find_element(:class, "confirm-subtitle")
+	end
+
+	def reschedule_apt_time()
+		return $test_driver.find_element(:class, "schedule-time")
+	end
+
+	def reschedule_office_details()
+		return $test_driver.find_element(:xpath => "//div[@class='upcoming-info']/div[@class='patient-info grid-whole']/div[@class='grid-half'][2]/dl[1]/dt[@class='blue']")
 	end
 
 	def reschedule_google_cal_link()
@@ -437,8 +490,44 @@ class MyAccountPage
 		return $test_driver.find_element(:id, "cancel-appointment")
 	end
 
+	def cancel_modal_x()
+		return $test_driver.find_element(:xpath => "//span[@class='icon icon-cancel-circle modal-close']")
+	end
+
+	def cancel_modal_header()
+		return $test_driver.find_element(:xpath => "//form[@id='cancel-appointment']/h3")
+	end
+
+	def cancel_copy()
+		return $test_driver.find_element(:xpath => "//div[@class='content-box upcoming-info cancel-modal']")
+	end
+
+	def cancel_apt_details()
+		return $test_driver.find_element(:xpath => "//div[@class='content-box upcoming-info cancel-modal']/h4")
+	end
+
+	def cancel_apt_time()
+		return $test_driver.find_element(:class, "schedule-time")
+	end
+
+	def cancel_office_details()
+		return $test_driver.find_element(:xpath => "//div[@class='content-box upcoming-info cancel-modal']/div[@class='patient-info grid-whole']/div[@class='grid-half'][2]")
+	end
+
+	def cancel_yes_copy()
+		return $test_driver.find_element(:class, "drop-down-title")
+	end
+
 	def cancel_close_link()
 		return $test_driver.find_element(:class, "close-link")
+	end
+
+	def cancel_reason_question()
+		return $test_driver.find_element(:class, "reason-question")
+	end
+
+	def cancel_required_message()
+		return $test_driver.find_element(:class, "required-message")
 	end
 
 	def cancel_reschedule_cta()
@@ -452,5 +541,9 @@ class MyAccountPage
 	#Letter must be capital, A - F
 	def cancel_reason_dropdown_items(letter)
 		return $test_driver.find_element(:id, "dk0-" + letter)
+	end
+
+	def cancel_submit()
+		return $test_driver.find_element(:class, "save-link")
 	end
 end

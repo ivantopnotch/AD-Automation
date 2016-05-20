@@ -80,7 +80,7 @@ def time_now_sec()
 end
 
 #Wait for an element to disappear
-def wait_for_disappear(element, timeout)
+def wait_for_disappear(element, timeout = 5)
 	start_time = time_now_sec
 	begin
 		while element.displayed? do
