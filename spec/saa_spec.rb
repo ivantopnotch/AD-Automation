@@ -164,7 +164,7 @@ describe "'Schedule An Appointment' page functionality" do
 
 			#Make sure we are at the office we specified
 			wait.until { saa.location_name.displayed? }
-			expect(saa.location_name.attribute("innerHTML") == "Prescott Valley, AZ")
+			expect(saa.location_name.attribute("innerHTML") == "Prescott Valley, AZ").to eql true
 
 			#Make sure office was NOT geolocated
 			expect(saa.show_location.attribute("innerHTML").include? "Do you want to schedule a new patient appointment at the following location:")
@@ -384,6 +384,7 @@ describe "'Schedule An Appointment' page functionality" do
 
 		it " - Abandonment modal" do 
 			$logger.info("Abandonment modal")
+			forsee = ForseePage.new().add_cookies()
 
 			#Step 1
 			step_1(false)
