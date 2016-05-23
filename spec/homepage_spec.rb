@@ -73,6 +73,7 @@ describe "Homepage functionality" do
 			forsee.add_cookies()
 
 			#Manually navigate to an office
+			sleep 1
 			$test_driver.navigate.to("https://" + $ad_env + $domain + "/dentist/prescott-valley-az-86314-2278")
 			sleep 1
 			#Navigate back to home
@@ -97,8 +98,8 @@ describe "Homepage functionality" do
 			test_link_tab(homepage.like_on_facebook_link, nil, "www.facebook.com/AspenDental")
 		end
 
-		 it " - Homepage emergency and patien forms tiles" do
-		 	$logger.info("Homepage emergency and patien forms tiles")
+		 it " - Homepage emergency and patient forms tiles" do
+		 	$logger.info("Homepage emergency and patient forms tiles")
 		 	forsee.add_cookies()
 
 		 	wait.until{ homepage.emergency_tile.displayed? }
@@ -124,7 +125,7 @@ describe "Homepage functionality" do
 					response = http.head("/" + url[1])
 				}
 				if(response.code != "200")
-					fail("Statement link returned code: " + response.code)
+					fail("Patient form link returned code: " + response.code)
 				end
 			end
 		end
