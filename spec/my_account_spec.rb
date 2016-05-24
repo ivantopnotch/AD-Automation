@@ -489,7 +489,7 @@ describe "My Account functionality" do
 			expect(myaccount.reschedule_header.attribute("innerHTML").include? "Reschedule an appointment").to eql true
 			expect(myaccount.confirm_message.attribute("innerHTML").include? "Thank you for your request. We'll send a confirmation email").to eql true
 			expect(myaccount.confirm_subtitle.attribute("innerHTML").include? "New Appointment Details").to eql true
-			expect(myaccount.reschedule_apt_time.attribute("innerHTML").include? "PM" || myaccount.reschedule_apt_time.attribute("innerHTML").include? "AM").to eql true
+			expect((myaccount.reschedule_apt_time.attribute("innerHTML").include? "PM") || (myaccount.reschedule_apt_time.attribute("innerHTML").include? "AM")).to eql true
 			expect(myaccount.reschedule_office_details.displayed?).to eql true
 
 			#Check links

@@ -276,6 +276,10 @@ class SaaPage
 		return $test_driver.find_element(:id, "thank-you")
 	end
 
+	def form_error()
+		return $test_driver.find_element(:xpath => "//span[@class='form-error active grid-7']")
+	end
+
 	def username()
 		return $test_driver.find_element(:id, "form-create-username")
 	end

@@ -29,7 +29,7 @@ class EpsilonPage
 	end
 
 	def month_option(i = 8)
-		return find_element(:id, "dk0-" + i.to_s)
+		return $test_driver.find_element(:id, "dk0-" + i.to_s)
 	end
 
 	def month_error()

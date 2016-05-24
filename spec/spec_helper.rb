@@ -167,3 +167,16 @@ def test_link_tab(link, expected_title = nil, expected_url = nil)
   end
   $test_driver.switch_to.window( $test_driver.window_handles.first )
 end
+
+#Check HTTP status
+#So we can check valid links without downloading files
+def check_http_status(href)
+  url = href.split(".com/")
+  response = nil
+  Net::HTTP.start(url[0].split("https://").last + ".com", 80) {|http|
+    response = http.head("/" + url[1])
+  }
+  if(response.code != "200")
+    fail(href + " returned code: " + response.code)
+  end
+end

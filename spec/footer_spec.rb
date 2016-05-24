@@ -8,6 +8,7 @@ def test_categorized_links(footer, cat_no, page_titles)
 	for i in 0 .. page_titles.length-1
 		#Click link
 		wait.until { footer.categorized_link(cat_no,i+1).displayed? }
+		js_scroll_up(footer.categorized_link(cat_no,i+1),true)
 		footer.categorized_link(cat_no,i+1).click
 		#Make sure we're on the right page
 		begin

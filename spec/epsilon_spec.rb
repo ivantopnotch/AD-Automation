@@ -104,10 +104,10 @@ describe "Epsilon sign-up page functionality" do
 			# Make sure we can't continue unless we select a month
 			epsilon.submit_cta.click
 			wait.until { epsilon.month_error.displayed? }
-			# Click a month option
+			# Click a month option, month error should disappear
 			epsilon.select_month.click
 			wait.until { epsilon.month_option.displayed? }
-			epsilon.month_option.click
+			epsilon.month_option(rand(1..12)).click
 			wait_for_disappear(epsilon.month_error, scroll_sleep_time)
 
 			$logger.info("Honeypot")

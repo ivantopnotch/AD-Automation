@@ -441,14 +441,7 @@ describe "'Schedule An Appointment' page functionality" do
 		# 		test_link_tab(links[i], titles[i])
 		# 	end
 		# 	#Check 'add to outlook' link status (we don't want to download the file)
-		# 	url = saa.add_outlook_link.attribute("href").split(".com/")
-		# 	response = nil
-		# 	Net::HTTP.start(url[0].split("https://").last + ".com", 80) {|http|
-		# 		response = http.head("/" + url[1])
-		# 	}
-		# 	if(response.code != "200")
-		# 		fail("Outlook link returned code: " + response.code)
-		# 	end
+		# 	check_http_status(saa.add_outlook_link.attribute("href"))
 
 		# 	$logger.info("Enter username")
 		# 	wait.until { saa.username.displayed? }
@@ -456,6 +449,7 @@ describe "'Schedule An Appointment' page functionality" do
 		# 	invalid_cases = ["12345678","!@#!@#!@","btntes7"]
 		# 	for i in 0.. invalid_cases.length-1
 		# 		test_val.text_input(saa.username, invalid_cases[i], true, saa.password)
+		# 		expect(saa.form_error.displayed?).to eql true
 		# 	end
 		# 	#Valid input
 		# 	test_val.text_input(saa.username, ('a'..'z').to_a.shuffle[0,8].join, false, saa.password)
@@ -465,10 +459,12 @@ describe "'Schedule An Appointment' page functionality" do
 		# 	invalid_cases = ["asdfjkl8","asdfjkl#","Bnt$s7"]
 		# 	for i in 0.. invalid_cases.length-1
 		# 		test_val.text_input(saa.password, invalid_cases[i], true, saa.confirm_password)
+		# 		expect(saa.form_error.displayed?).to eql true
 		# 	end
 		# 	#Different passwords
 		# 	test_val.text_input(saa.password, "Bnte$s7")
 		# 	test_val.text_input(saa.confirm_password, "Bnte$s8", true, saa.password)
+		# 	expect(saa.form_error.displayed?).to eql true
 		# 	#Valid input
 		# 	saa.password.clear
 		# 	password = "TN1" + ('a'..'z').to_a.shuffle[0,8].join + "!"
@@ -479,6 +475,7 @@ describe "'Schedule An Appointment' page functionality" do
 		# 	#Invalid input
 		# 	#No input
 		# 	saa.security_answer.click
+		# 	js_scroll_up(saa.confirm_password,true)
 		# 	saa.confirm_password.click
 		# 	expect(saa.security_answer.attribute("class").include? "is-error").to eql true
 		# 	#Make sure we can't enter more than 50 characters
