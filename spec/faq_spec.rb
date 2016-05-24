@@ -39,13 +39,13 @@ describe "Faq pages functionality" do
 		#Load page titles from json
 		parsed = JSON.parse(open("spec/page_titles.json").read)
 
-		# it " - Sidebar" do
-		# 	$logger.info("Sidebar")
-		# 	#Click oral health link on header
-		# 	header.dropdown(8).click
-		# 	#These are the expected page titles, NOT the link text
-		# 	tc.test_sidebar_links(parsed["top-pages"]["faqs"],parsed["faqs"].values)
-		# end
+		it " - Sidebar" do
+			$logger.info("Sidebar")
+			#Click oral health link on header
+			header.dropdown(8).click
+			#These are the expected page titles, NOT the link text
+			tc.test_sidebar_links(parsed["top-pages"]["faqs"],parsed["faqs"].values)
+		end
 
 		it " - FAQ landing page" do
 			$logger.info("FAQ landing page")

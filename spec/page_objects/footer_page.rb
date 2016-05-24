@@ -104,4 +104,8 @@ class FooterPage
     def office_listings_link()
         return $test_driver.find_element(:id, "footer").find_element(:partial_link_text, "Dental Office Listings")
     end
+
+    def copyright()
+        return $test_driver.find_element(:class, "copyright")
+    end
 end
