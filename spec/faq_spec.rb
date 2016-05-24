@@ -3,7 +3,7 @@ require 'two_column_spec'
 
 def test_faq_items(faq)
 	wait = Selenium::WebDriver::Wait.new(timeout: 3)
-	#Test oral_health anchors
+	#Test anchors
 	$logger.info("Anchors")
 	faq.items.each do |elem|
 		#Click oral_health item
@@ -21,7 +21,7 @@ def test_faq_items(faq)
 		#Make sure we're anchored correctly upon click
 		js_scroll_up(link,true)
 		link.click
-		wait.until { faq.content.displayed? }
+		wait.until { faq.heading.displayed? }
 	end
 end
 
@@ -39,13 +39,13 @@ describe "Faq pages functionality" do
 		#Load page titles from json
 		parsed = JSON.parse(open("spec/page_titles.json").read)
 
-		it " - Sidebar" do
-			$logger.info("Sidebar")
-			#Click oral health link on header
-			header.dropdown(8).click
-			#These are the expected page titles, NOT the link text
-			tc.test_sidebar_links(parsed["top-pages"]["faqs"],parsed["faqs"].values)
-		end
+		# it " - Sidebar" do
+		# 	$logger.info("Sidebar")
+		# 	#Click oral health link on header
+		# 	header.dropdown(8).click
+		# 	#These are the expected page titles, NOT the link text
+		# 	tc.test_sidebar_links(parsed["top-pages"]["faqs"],parsed["faqs"].values)
+		# end
 
 		it " - FAQ landing page" do
 			$logger.info("FAQ landing page")
@@ -74,9 +74,9 @@ describe "Faq pages functionality" do
 			tc.test_breadcrumbs("faqs","my-first-visit","FAQs","My First Visit")
 			#Test all links
 			$logger.info("In-text links")
-			test_link_back(faq.new_patient_forms_link, title, "Patient Forms")
-			test_link_back(faq.download_patient_forms_cta, title, "Patient Forms")
-			test_link_back(faq.treatment_plan_link, title, "Understanding Your Dental Treatment Plan")
+			test_link_back(faq.new_patient_forms_link, title, parsed["misc"]["patient-forms"])
+			test_link_back(faq.download_patient_forms_cta, title, parsed["misc"]["patient-forms"])
+			test_link_back(faq.treatment_plan_link, title, parsed["what-to-expect"]["understanding-dental-treatment"])
 
 			test_faq_items(faq)
 			#Closest office container
@@ -93,8 +93,8 @@ describe "Faq pages functionality" do
 			tc.test_breadcrumbs("faqs","appointments","FAQs","Appointments")
 			#Test all links
 			$logger.info("In-text links")
-			test_link_back(faq.pricing_and_offers_link, title, "Pricing & Offers")
-			test_link_back(faq.here_link, title, "Dental Insurance & Financing")
+			test_link_back(faq.pricing_and_offers_link, title, parsed["office"]["pricing-offers"])
+			test_link_back(faq.here_link, title, parsed["office"]["insurance-financing"])
 			test_link_back(faq.please_click_here_link, title, parsed["what-to-expect"]["overcoming-dental-anxiety"])
 			test_faq_items(faq)
 			#Closest office container
@@ -142,8 +142,10 @@ describe "Faq pages functionality" do
 			tc.test_breadcrumbs("faqs","my-account-faq","FAQs","My Account")
 			#Test all links
 			test_link_back(faq.my_account_link, title, parsed["top-pages"]["my-account"])
-			test_link_back(faq.here_link, title, parsed["top-pages"]["my-account"])
 			test_link_back(faq.login_link, title, parsed["top-pages"]["my-account"])
+			test_link_back(faq.contact_us_link, title, parsed["about"]["contact"])
+			test_link_back(faq.here_link, title, parsed["top-pages"]["my-account"])
+
 			test_faq_items(faq)
 			#Closest office container
 			tc.test_closest_office_details(title,true)

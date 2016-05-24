@@ -23,11 +23,11 @@ class TwoColumnPage
 	end
 
 	def sidebar_link(i)
-		return $test_driver.find_element(:id, "content").find_element(:xpath => "//div[@class='container direct-container']/div/div[@class='main']/div[@class='grid-4']/div[@id='sidebar']/ul/li["+i.to_s+"]/a")
+		return $test_driver.find_element(:id, "content").find_element(:xpath => "//div[@class='container direct-container']/div/div[@class='main']/div[@class='grid-4']/div[@id='sidebar']/ul/li["+i.to_s+"]")
 	end
 
 	def sidebar_sub_link(i)
-		return $test_driver.find_element(:id, "content").find_element(:xpath => "//div[@class='container direct-container']/div/div[@class='main']/div[@class='grid-4']/div[@id='sidebar']/ul/li[@class='active']/ul/li["+i.to_s+"]/a")
+		return $test_driver.find_element(:id, "content").find_element(:xpath => "//div[@class='container direct-container']/div/div[@class='main']/div[@class='grid-4']/div[@id='sidebar']/ul/li[@class='active']/ul/li["+i.to_s+"]")
 	end
 
 	def closest_office_details()

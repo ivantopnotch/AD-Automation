@@ -132,6 +132,8 @@ class TwoColumnSpec
 					#Check page title
 					begin
 						@wait.until { $test_driver.title.include? page_titles[i][j] }
+						#Verify carrot
+						expect(@two_column.sidebar_sub_link(j+1).attribute("class") == "active").to eql true
 					rescue Selenium::WebDriver::Error::TimeOutError
 						$logger.info("Error loading sub page " + page_titles[i][j])
 						fail("Error loading sub page " + page_titles[i][j])
@@ -151,6 +153,8 @@ class TwoColumnSpec
 				#Check page title
 				begin
 					@wait.until { $test_driver.title.include? page_titles[i] }
+					#Verify carrot
+					expect(@two_column.sidebar_link(i+1).attribute("class") == "active").to eql true
 				rescue Selenium::WebDriver::Error::TimeOutError
 					$logger.info("Error loading page " + page_titles[i])
 					fail("Error loading page " + page_titles[i])

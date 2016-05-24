@@ -8,6 +8,10 @@ class FaqPage
 		return $test_driver.find_element(:id, "content")
 	end
 
+	def heading()
+		return $test_driver.find_element(:xpath => "//div[@class='content']/div[1]/h1")
+	end
+
 	#Get all faq page items
 	def items()
 		#Compile all three columns into one array
@@ -74,5 +78,9 @@ class FaqPage
 
 	def login_link()
 		return $test_driver.find_element(:link_text, "log-in page")
+	end
+
+	def contact_us_link()
+		return $test_driver.find_element(:link_text, "contact us")
 	end
 end
