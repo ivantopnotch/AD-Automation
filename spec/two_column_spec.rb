@@ -154,7 +154,7 @@ class TwoColumnSpec
 				begin
 					@wait.until { $test_driver.title.include? page_titles[i] }
 					#Verify carrot
-					expect(@two_column.sidebar_link(i+1).attribute("class") == "active").to eql true
+					expect(@two_column.sidebar_link(i+1-num_sub).attribute("class") == "active").to eql true
 				rescue Selenium::WebDriver::Error::TimeOutError
 					$logger.info("Error loading page " + page_titles[i])
 					fail("Error loading page " + page_titles[i])

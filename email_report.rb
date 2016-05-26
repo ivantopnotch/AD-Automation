@@ -16,7 +16,7 @@ end
 options = { :address              => "smtp.gmail.com",
             :port                 => 587,
             :user_name            => 'topnotchtester@gmail.com',
-            :password             => 'TopNotch123!',
+            :password             => '',
             :authentication       => 'plain',
             :enable_starttls_auto => true  }
 

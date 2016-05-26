@@ -16,13 +16,13 @@ class DenturesPage
 		return $test_driver.find_elements(:link_text, "here")
 	end
 
-	#Carousel stuff
-	def current_slide()
-		return $test_driver.find_element(:xpath => "//div[@class='slick-slide slick-current slick-active']")
+	def promotional_callout()
+		return $test_driver.find_element(:xpath => "//div[@class='cross-linked product-page']")
 	end
 
+	#Carousel stuff
 	def slide(i)
-		return $test_driver.find_element(:xpath => "//div[@class='slick-content']/div[@class='slick slick-initialized slick-slider']/div[@class='slick-list draggable']/div[@class='slick-track']/div["+i.to_s+"]")
+		return $test_driver.find_element(:xpath => "//div[@class='slick-track']/div["+i.to_s+"]")
 	end
 
 	def next_arrow_cta()
@@ -33,7 +33,27 @@ class DenturesPage
 		return $test_driver.find_element(:xpath => "//button[@class='slick-prev slick-arrow']")
 	end
 
+	def meatball(i)
+		return $test_driver.find_element(:xpath => "//ul[@class='slick-dots']/li["+i.to_s+"]/button")
+	end
+
 	#Dentures landing page
+	def talk_about_dentures()
+		return $test_driver.find_element(:xpath => "//div[@class='content']/div[1]/h1")
+	end
+
+	def money_back_guarantee()
+		return $test_driver.find_element(:xpath => "//div[@class='content']/div[1]/table/tbody/tr/td[1]/h2")
+	end
+
+	def dentures_at_a_glance()
+		return $test_driver.find_element(:xpath => "//div[@class='content']/div[1]/h2")
+	end
+
+	def ada_image()
+		return $test_driver.find_element(:xpath => "//div[@class='content']/div[1]/p[7]/strong/img")
+	end
+
 	def compare_dentures_cta()
 		return $test_driver.find_element(:partial_link_text, "Compare Dentures")
 	end
@@ -142,6 +162,18 @@ class DenturesPage
 		return $test_driver.find_element(:xpath => "//div[@id='partial-dentures']/div[@class='comparison-table']/table/tbody/tr[2]/td[@class='denture-image']["+i.to_s+"]/a/img")
 	end
 
+	def appearance_rows()
+		return $test_driver.find_elements(:xpath => "//table/tbody/tr[3]/td[@class='category']")
+	end
+
+	def material_rows()
+		return $test_driver.find_elements(:xpath => "//table/tbody/tr[5]/td[@class='category']")
+	end
+
+	def warranty_rows()
+		return $test_driver.find_elements(:xpath => "//table/tbody/tr[7]/td[@class='category']")
+	end
+
 	def office_details_links()
 		return $test_driver.find_elements(:link_text, "See Office Details Page for Pricing Information")
 	end
@@ -170,4 +202,70 @@ class DenturesPage
 	def flexilytes_link2()
 		return $test_driver.find_element(:link_text, "FlexiLytes")
 	end
+
+	#Cast partial page
+	def denture_promo()
+		return $test_driver.find_element(:xpath => "//div[@class='content']/div[1]/p[3]/a/img")
+	end
+
+	def six_month_warranty_link()
+		return $test_driver.find_element(:link_text, "6-month limited warranty")
+	end
+
+	#Flexilytes page
+	def two_year_warranty_link()
+		return $test_driver.find_element(:link_text, "2-year limited warranty")
+	end
+
+	#Basic full page
+	def six_month_warranty_short_link()
+		return $test_driver.find_element(:link_text, "6-month warranty")
+	end
+
+	# Classic full page
+	def one_year_warranty_link()
+		return $test_driver.find_element(:link_text, "1-year warranty")
+	end
+
+	#Naturalytes page
+	def three_year_warranty_link()
+		return $test_driver.find_element(:link_text, "3-year warranty")
+	end
+
+	#Comfilytes page
+	def seven_year_warranty_link()
+		return $test_driver.find_element(:link_text, "7-year limited warranty")
+	end
+
+	def seven_year_warranty_short_link()
+		return $test_driver.find_element(:link_text, "7-year warranty")
+	end
+
+	def denture_promo2()
+		return $test_driver.find_element(:xpath => "//div[@class='content']/div[1]/p[4]/a/img")
+	end
+
+	# Denture repair / reline page
+	def denture_promo3()
+		return $test_driver.find_element(:xpath => "//div[@class='content']/div[1]/table/tbody/tr/td[2]/a/img")
+	end
+
+	# Denture advice page
+	def contact_link()
+		return $test_driver.find_element(:link_text, "contact")
+	end
+
+	def adjustments_link()
+		return $test_driver.find_element(:link_text, "same-day adjustments")
+	end
+
+	#When to get dentures page
+	def schedule_link()
+		return $test_driver.find_element(:link_text, "Schedule an appointment")
+	end
+
+	def contact_dentist_link()
+		return $test_driver.find_element(:link_text, "contact your dentist")
+	end
+	
 end
