@@ -139,6 +139,7 @@ def test_link_tab(link, expected_title = nil, expected_url = nil)
   wait = Selenium::WebDriver::Wait.new(timeout: 3)
   
   #Open link
+  js_scroll_up(link)
   link.click
   $test_driver.switch_to.window( $test_driver.window_handles.last )
   #Test it for URL or title

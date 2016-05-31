@@ -2,7 +2,6 @@ require 'spec_helper'
 require 'two_column_spec'
 
 describe "Health Mouth Movement page functionality" do
-	header = HeaderPage.new()
 	forsee = ForseePage.new()
 	hmm = HmmPage.new()
 	tc = TwoColumnSpec.new()
