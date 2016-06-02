@@ -185,6 +185,11 @@ describe "Office details functionality" do
 				expect(offdet.first_time_cells[i].displayed?)
 			end
 
+			#Verify all prices are shown
+			for i in 0 .. 18 do
+				offdet.service_prices[i].displayed?
+			end
+
 			#Special offers
 			for i in 0 .. 1
 				js_scroll_up(offdet.terms_conditions_links[i])

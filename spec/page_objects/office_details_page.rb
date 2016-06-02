@@ -92,6 +92,10 @@ class OfficeDetailsPage
 		return $test_driver.find_elements(:partial_link_text, "Return to the top")
 	end
 
+	def service_prices()
+		return $test_driver.find_elements(:class, "service-prices")
+	end
+
 	#Elements that are anchored to
 	def general_dentistry()
 		return $test_driver.find_element(:id, "general-dentistry")
