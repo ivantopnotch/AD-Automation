@@ -17,7 +17,7 @@ RSpec.configure do |config|
   config.include AllureRSpec::Adaptor
 
   $logger = Logger.new('aspendental_test.txt')
-  $ad_env = "uat-web"
+  $ad_env = "delta-www"
   $domain = ".aspendental.com"
 
   utility = AspenDental.new()

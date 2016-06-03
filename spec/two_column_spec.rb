@@ -41,6 +41,8 @@ class TwoColumnSpec
 		rescue Selenium::WebDriver::Error::TimeOutError
 			#Try again
 			retry if (num_retry += 1) == 1
+		rescue Selenium::WebDriver::Error::ElementNotVisibleError
+			retry if (num_retry += 1) == 1
 		end
 	end
 
