@@ -18,7 +18,11 @@ def test_abandon_modal(step_no, saa, just_open = false)
 			wait.until { saa.close_abandon_modal.displayed? }
 			saa.close_abandon_modal.click
 			# Wait for modal to disappaer
-			wait_for_disappear(saa.abandonment_modal, 3)
+			begin
+				wait_for_disappear(saa.abandonment_modal, 3)
+			rescue Selenium::WebDriver::Error::NoSuchElementError
+				#This is what we want
+			end
 		end
 	else
 		wait.until { saa.logo_link.displayed? }

@@ -67,7 +67,7 @@ class SaaPage
 	end
 
 	def fao_link()
-		return $test_driver.find_element(:link_text, "No? Choose another one of our 500 locations.")
+		return $test_driver.find_element(:partial_link_text, "No? Choose another one of our")
 	end
 
 	# np = new-patient
