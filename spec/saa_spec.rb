@@ -115,7 +115,7 @@ def step_3()
 	test_val.text_input(saa.pn_exchange_code, 666, false, saa.email)
 
 	#Suffix code
-	test_val.text_input(saa.pn_suffix_code, "666666", false, saa.email)
+	test_val.text_input(saa.pn_suffix_code, "666666", false, saa.email) #Extra characters just in case
 
 	#Click on 'yes' under "Does the patient have dental insurance?"
 	wait.until { saa.insurance_yes.displayed? }
@@ -418,7 +418,11 @@ describe "'Schedule An Appointment' page functionality" do
 			test_abandon_modal(1, saa, true)
 			saa.back_to_schedule_cta.click
 			# Wait for modal to disappaer
-			wait_for_disappear(saa.abandonment_modal, 3)
+			begin
+				wait_for_disappear(saa.abandonment_modal, 3)
+			rescue Selenium::WebDriver::Error::NoSuchElementError
+				#This is what we want
+			end
 		end
 
 		# it " - Sign up page" do
