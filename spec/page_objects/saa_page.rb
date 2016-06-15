@@ -32,7 +32,7 @@ class SaaPage
 	end
 
 	def abandonment_modal()
-		return $test_driver.find_element(:class, "modal-close")
+		return $test_driver.find_element(:xpath => "//div[@class='modal-content modal-abandon modal-global']")
 	end
 
 	#This is the circular X cta

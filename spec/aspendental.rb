@@ -14,8 +14,10 @@ class AspenDental
         #profile = Selenium::WebDriver::Firefox::Profile.new
         profile['network.http.connection-timeout'] = 5
         profile['network.cookie.cookieBehavior'] = 0
+        profile['reader.parse-on-load.enabled'] = false
+        caps = Selenium::WebDriver::Remote::Capabilities.firefox :marionette => true#, :profile => profile
         Selenium::WebDriver::Firefox.path = ENV['BROWSER_LOCATION']
-        return Selenium::WebDriver.for :firefox, :profile => profile
+        return Selenium::WebDriver.for :firefox, :profile => profile#, :desired_capabilities => caps
       when 'CHROME'
         Selenium::WebDriver::Chrome::Service.executable_path = File.join(Dir.pwd, ENV['BROWSER_LOCATION'])
         return Selenium::WebDriver.for :chrome

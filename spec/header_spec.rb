@@ -21,6 +21,7 @@ def test_dropdown(header, drop_no, page_titles)
 	for i in 0 .. page_titles.length-1
 		#Hover over dropdown
 		wait.until { header.dropdown(drop_no).displayed? }
+		puts page_titles[i]
 		hover_dropdown(header.dropdown(drop_no),header.dropdown_link(drop_no,i+1),3,"Header dropdown #"+drop_no.to_s+", link #"+i.to_s+" did not appear")
 
 		#Click link and check page title
@@ -72,12 +73,13 @@ describe "Header functionality" do
 		it " - 'My account' CTA" do
 			$logger.info("'My account' CTA")
 			header.my_account_cta.click
-			wait.until { $test_driver.title.include? parsed["top-pages"]["my-account"] }
+			wait.until { $test_driver.title.include? parsed["my-account"]["sign-in"] }
 		end
 
 		it " - Dental Services dropdown" do
 			$logger.info("Dental Services dropdown")
 			#Test link
+			wait.until { header.dropdown(1).displayed? }
 			header.dropdown(1).click
 			wait.until { $test_driver.title.include? parsed["top-pages"]["dental-services"] }
 			#Modify page titles to match header
@@ -104,6 +106,7 @@ describe "Header functionality" do
 			parsed["dentures"].delete("when-to-get-dentures")
 			parsed["dentures"].delete("denture-facts-mythos")
 			parsed["dentures"].delete("how-to-clean-dentures")
+			parsed["dentures"].delete("denture-facts-myths")
 			test_dropdown(header,2,parsed["dentures"].values)
 		end
 

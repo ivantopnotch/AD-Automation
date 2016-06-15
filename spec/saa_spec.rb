@@ -162,6 +162,7 @@ describe "'Schedule An Appointment' page functionality" do
 			$test_driver.navigate.to("https://" + $ad_env + $domain + "/dentist/prescott-valley-az-86314-2278")
 
 			#Click SAA link
+			#handle_reader_popup()
 			header.saa_cta.click
 			wait.until { $test_driver.title.include? title }
 			sleep 1
