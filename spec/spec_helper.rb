@@ -17,7 +17,7 @@ RSpec.configure do |config|
   config.include AllureRSpec::Adaptor
 
   $logger = Logger.new('aspendental_test.txt')
-  $ad_env = "delta-www"
+  $ad_env = "uat-web"
   $domain = ".aspendental.com"
 
   utility = AspenDental.new()
@@ -26,7 +26,9 @@ RSpec.configure do |config|
     test_url = "https://" + $ad_env + $domain
     $test_driver = utility.get_test_driver()
 
-    $test_driver.manage.window.move_to(0, 0)
+    if(ENV['BROWSER_TYPE'] != 'FIREFOX')
+      $test_driver.manage.window.move_to(0, 0)
+    end
     $test_driver.manage.window.resize_to(ENV['BROWSER_WIDTH'], ENV['BROWSER_HEIGHT'])
 
     $test_driver.navigate.to(test_url)
@@ -179,5 +181,13 @@ def check_http_status(href)
   }
   if(response.code != "200")
     fail(href + " returned code: " + response.code)
+  end
+end
+
+#Handle firefox's damn reader view popup
+def handle_reader_popup()
+  if ENV['BROWSER_TYPE'] == 'FIREFOX'
+    $test_driver.navigate.refresh
+    sleep 1
   end
 end

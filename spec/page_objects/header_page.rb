@@ -29,12 +29,12 @@ class HeaderPage
   #Dropdowns and their links
   def dropdown(number)
     #Quick hack
-    number += 1
+    #number += 1
     return $test_driver.find_element(:xpath, "//nav[@id='site-nav-wrapper']/ul[@class='site-nav']/li[@class='nav-item-wrapper']["+number.to_s+"]")
   end
 
   def dropdown_link(drop_no, link_no)
-    drop_no += 1
+    #drop_no += 1
     return $test_driver.find_element(:xpath, "//nav[@id='site-nav-wrapper']/ul[@class='site-nav']/li[@class='nav-item-wrapper']["+drop_no.to_s+"]/ul/li["+link_no.to_s+"]/a")
   end
 

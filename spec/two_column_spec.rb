@@ -99,14 +99,14 @@ class TwoColumnSpec
 		if(third != nil)
 			expect(bc[2].attribute("href").split("/").last).to eql third
 			if(txThird != nil)
-				expect(bc[2].attribute("text") ).to eql txThird
+				expect(bc[2].attribute("text").downcase ).to eql txThird.downcase
 			end
 		end
 		#Check fourth, if applicable
 		if(fourth != nil)
 			expect(bc[3].attribute("href").split("/").last).to eql fourth
 			if(txFourth != nil)
-				expect(bc[3].attribute("text") ).to eql txFourth
+				expect(bc[3].attribute("text").downcase ).to eql txFourth.downcase
 			end
 		end
 	end

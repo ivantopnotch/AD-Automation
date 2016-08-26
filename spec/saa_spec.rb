@@ -160,6 +160,7 @@ describe "'Schedule An Appointment' page functionality" do
 
 			#Manually navigate to office page
 			$test_driver.navigate.to("https://" + $ad_env + $domain + "/dentist/prescott-valley-az-86314-2278")
+			sleep 1
 
 			#Click SAA link
 			#handle_reader_popup()

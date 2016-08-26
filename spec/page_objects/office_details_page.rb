@@ -138,11 +138,11 @@ class OfficeDetailsPage
 	end
 
 	def full_dentures_table()
-		return $test_driver.find_element(:xpath => "//div[@id='pricing-and-offers']/div[@class='tab-section'][2]/div[2]")
+		return $test_driver.find_element(:xpath => "//div[@id='pricing-and-offers']/div[@class='tab-section'][2]/div[3]")
 	end
 
 	def partial_dentures_table()
-		return $test_driver.find_element(:xpath => "//div[@id='pricing-and-offers']/div[@class='tab-section'][2]/div[4]")
+		return $test_driver.find_element(:xpath => "//div[@id='pricing-and-offers']/div[@class='tab-section'][2]/div[5]")
 	end
 
 	def replacement_cells()
