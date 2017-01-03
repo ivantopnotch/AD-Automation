@@ -10,18 +10,19 @@ class AspenDental
     case ENV['BROWSER_TYPE']
       when 'FIREFOX'
         #Load adblock profile
-        profile = Selenium::WebDriver::Firefox::Profile.from_name "adblock"
-        #profile = Selenium::WebDriver::Firefox::Profile.new
+        #profile = Selenium::WebDriver::Firefox::Profile.from_name "adblock"
+        profile = Selenium::WebDriver::Firefox::Profile.new
         profile['network.http.connection-timeout'] = 5
         profile['network.cookie.cookieBehavior'] = 0
         profile['reader.parse-on-load.enabled'] = false
         #caps = Selenium::WebDriver::Remote::Capabilities.firefox :marionette => true#, :profile => profile
+        caps = Selenium::WebDriver::Remote::Capabilities.firefox :marionette => true
         Selenium::WebDriver::Firefox.path = ENV['BROWSER_LOCATION']
-        return Selenium::WebDriver.for :firefox, :profile => profile#, :desired_capabilities => caps
+        return Selenium::WebDriver.for :firefox, :profile => profile, :desired_capabilities => caps
       when 'CHROME'
-        Selenium::WebDriver::Chrome::Service.executable_path = File.join(Dir.pwd, ENV['BROWSER_LOCATION'])
+        #Selenium::WebDriver::Chrome.driver_path = File.join(Dir.pwd, ENV['BROWSER_LOCATION'])
         caps = Selenium::WebDriver::Remote::Capabilities.chrome("chromeOptions" => {"args" => [ "--disable-extensions" ]})
-        return Selenium::WebDriver.for :chrome, :desired_capabilities => caps
+        return Selenium::WebDriver.for :chrome, :desired_capabilities => caps, :driver_path => File.join(Dir.pwd, ENV['BROWSER_LOCATION'])
       when 'SAFARI'
         return :safari
       when 'IE'
