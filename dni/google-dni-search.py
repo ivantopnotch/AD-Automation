@@ -25,7 +25,7 @@ for query in queries:
     searchField.send_keys(Keys.RETURN)
 
     try:
-        #Wait for page to load (result class 'r' does not exist until then)
+        # Wait for page to load (result class 'r' does not exist until then)
         WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'r')))
         resultElements = driver.find_elements_by_css_selector('.r a')
         officeUrls = []
@@ -37,8 +37,8 @@ for query in queries:
                 officeUrls.append(elementUrl)
 
         if (len(officeUrls) > 0):
-            for u in range(len(officeUrls)):
-                driver.find_element_by_xpath('//a[@href="' + officeUrls[u] + '"]').click()
+            for url in range(len(officeUrls)):
+                driver.find_element_by_xpath('//a[@href="' + officeUrls[url] + '"]').click()
                 WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'telephone')))
                 
                 # Get phone number from page
